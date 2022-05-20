@@ -118,7 +118,7 @@ For example, to store some `String`:
 try {
     Storage storage = environment.getStorage();
     storage.store(new BinaryProduct("hello world".getBytes()));
-catch (StorageException e) {
+} catch (StorageException e) {
     throw new CommandException(e);
 }
 ```
