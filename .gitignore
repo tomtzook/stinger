@@ -1,0 +1,8 @@
+.idea
+.vs
+.gradle
+bin
+build
+lgbt
+*.bak
+*.db
