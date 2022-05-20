@@ -1,0 +1,34 @@
+[
+  {
+    "mName": "STOP",
+    "mIntValue": 0
+  },
+  {
+    "mName": "PUT_FILE",
+    "mIntValue": 1
+  },
+  {
+    "mName": "GET_FILE",
+    "mIntValue": 2
+  },
+  {
+    "mName": "DELETE_PATH",
+    "mIntValue": 3
+  },
+  {
+    "mName": "LIST_DIR",
+    "mIntValue": 4
+  },
+  {
+    "mName": "TAKE_SCREENSHOT",
+    "mIntValue": 5
+  },
+  {
+    "mName": "START_KEYLOGGER",
+    "mIntValue": 6
+  },
+  {
+    "mName": "STOP_KEYLOGGER",
+    "mIntValue": 7
+  }
+]
