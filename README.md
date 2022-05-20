@@ -48,3 +48,80 @@ Each command will do something different and product a different result.
 
 ### Making Changes
 
+#### Adding New Commands
+
+To add new commands, one needs to implement a new `Command` class and configure both _Stinger_ and the server to recognize it.
+
+Start by creating a new class in `stinger.commands.impl` package. Make it implement `Command`:
+```java
+class MyCommand implements Command {
+
+    @Override
+    public void execute(StingerEnvironment environment, Parameters parameters) throws CommandException {
+    
+    }
+}
+```
+
+When executed, the `execute` method is called with several arguments:
+- `environment`: provides access to different parts of _Stinger_ for usage.
+- `parameters`: contains the parameters send by the user. A parameter is identified by a `String` key and has a value.
+
+Each command perform different operations, so they can look quite different. But generally it involves reading the parameters, performing something and storing the result in the storage.
+
+Commands can fail or succeed. When failing commands will throw `CommandException`, so remember to throw it when unable to perform the wanted operation.
+
+After implementing the command, you must now configure it.
+Go to `stinger.commands.StandardCommandType` file. You will see definitions for commands; add a new one.
+```java
+    MY_COMMAND(id) {
+        @Override
+        public Command createCommand() {
+            return new MyCommand();
+        }
+    }
+```
+
+`id` is a constant number you must choose which identifies your command. Make sure no other command has that id.
+
+Next, go to `stinger-server/command.types.json` and add a definition for you command for the server:
+```json
+  {
+    "mName": "MY_COMMAND",
+    "mIntValue": id
+  }
+```
+
+Remember to set `mIntValue` to your chosen id.
+
+Create an example for the _command file_ in the `stinger-server/commands` folder and name it `mycommand.command.json`:
+```json
+[
+	{
+		"mType": id,
+		"mParams": {
+			"param1": "value"
+		}
+	}
+]
+```
+
+Set `mType` to the command id and fill `mParams` with the parameters your command expects (or leave it empty if it doesn't).
+
+
+##### Using The Storage
+
+The storage is represented by the `Storage` class, which can be retreived from `environment`. It can store `Product` objects. For now, there are two such types: `FileProduct` and `BinaryProduct`.
+
+For example, to store some `String`:
+```java
+try {
+    Storage storage = environment.getStorage();
+    storage.store(new BinaryProduct("hello world".getBytes()));
+catch (StorageException e) {
+    throw new CommandException(e);
+}
+```
+Note that storage may fail and will throw a `StorageException`. We will just propogate it to fail the command in this case.
+
+
