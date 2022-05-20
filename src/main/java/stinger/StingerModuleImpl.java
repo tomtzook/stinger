@@ -1,25 +1,24 @@
 package stinger;
 
-import stinger.os.keylogger.KeyloggerModule;
-import stinger.os.nhooks.NativeHooksModule;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class StingerModuleImpl implements StingerModules {
 
-    private final NativeHooksModule mNativeHooksModule;
-    private final KeyloggerModule mKeyloggerModule;
+    private final Set<Module> mModules;
 
-    public StingerModuleImpl(NativeHooksModule nativeHooksModule, KeyloggerModule keyloggerModule) {
-        mNativeHooksModule = nativeHooksModule;
-        mKeyloggerModule = keyloggerModule;
+    public StingerModuleImpl(Set<Module> modules) {
+        mModules = modules;
     }
 
     @Override
-    public NativeHooksModule getNativeHooks() {
-        return mNativeHooksModule;
-    }
+    public <T extends Module> T get(Class<T> type) throws NoSuchElementException {
+        for (Module module : mModules) {
+           if (type.isInstance(module) || type.isAssignableFrom(module.getClass())) {
+               return type.cast(module);
+           }
+        }
 
-    @Override
-    public KeyloggerModule getKeylogger() {
-        return mKeyloggerModule;
+        throw new NoSuchElementException();
     }
 }

