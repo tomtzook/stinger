@@ -1,6 +1,7 @@
 package stinger.commands;
 
 import stinger.commands.impl.GetFileCommand;
+import stinger.commands.impl.StopCommand;
 import stingerlib.commands.CommandType;
 
 public enum StandardCommandType implements CommandType {
@@ -8,6 +9,12 @@ public enum StandardCommandType implements CommandType {
         @Override
         public Command createCommand() {
             return new GetFileCommand();
+        }
+    },
+    STOP(3) {
+        @Override
+        public Command createCommand() {
+            return new StopCommand();
         }
     }
     ;

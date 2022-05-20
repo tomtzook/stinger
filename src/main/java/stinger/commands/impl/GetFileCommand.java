@@ -2,21 +2,29 @@ package stinger.commands.impl;
 
 import stinger.StingerEnvironment;
 import stinger.commands.Command;
+import stinger.storage.Storage;
+import stinger.storage.impl.FileProduct;
 import stingerlib.commands.CommandException;
 import stingerlib.commands.Parameters;
+import stingerlib.storage.StorageException;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class GetFileCommand implements Command {
 
     @Override
     public void execute(StingerEnvironment environment, Parameters parameters) throws CommandException {
-        // TODO: IMPLEMENT
-        // This command should receive file information in the parameters.
-        // and return a product containing the file data.
-        // If the file doesn't exist, log.
-        // If path is not a file, log.
-        // parameters:
-        // - path: the path to the file to return
-        // result:
-        // - creates and stores product containing the file content. Use FileProduct.
+        try {
+            String pathStr = parameters.getString("path");
+            Path path = Paths.get(pathStr);
+
+            Storage storage = environment.getStorage();
+            storage.store(new FileProduct(path));
+        } catch (StorageException e) {
+            throw new CommandException(e);
+        }
     }
 }
