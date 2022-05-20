@@ -9,7 +9,7 @@ public class Constants {
 
     public static final int CORE_THREAD_POOL_SIZE = 5;
 
-    public static final long COMMUNICATION_INTERVAL_MS = 60 * 1000;
+    public static final long COMMUNICATION_INTERVAL_MS = 30 * 1000;
     public static final SocketAddress COMMUNICATION_END_POINT = new InetSocketAddress("localhost", 10000);
 
     public static final long LOGGING_RECORDS_ROTATE = 1000;
