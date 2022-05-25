@@ -2,6 +2,8 @@
 
 _OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER OMER_
 
+Each assignment should be done in its own branch (created from `master`). When finished, open a Pull Request, but don't merge it.
+
 Assignments to perform:
 
 #### Omer (Omer)
