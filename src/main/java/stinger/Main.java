@@ -1,5 +1,7 @@
 package stinger;
 
+import com.castle.nio.PathMatching;
+import com.castle.nio.PatternPathFinder;
 import com.castle.nio.temp.TempPath;
 import com.castle.nio.zip.OpenZip;
 import com.castle.nio.zip.Zip;
@@ -12,6 +14,7 @@ import stinger.storage.Storage;
 import stinger.storage.StorageIndex;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +28,7 @@ import java.util.regex.Pattern;
 public class Main {
 
     public static void main(String[] args) {
-        loadNatives();
+        loadOpenCVNatives();
 
         ExecutorService executorService = Executors.newFixedThreadPool(Constants.CORE_THREAD_POOL_SIZE);
         try {
@@ -69,18 +72,19 @@ public class Main {
         }
     }
 
-    private static void loadNatives() {
-        String pattern;
+    private static void loadOpenCVNatives() {
+        String patternStr;
         switch (com.castle.util.os.System.operatingSystem()) {
             case Windows:
-                pattern = "^.*opencv_java\\d+\\.(?:dll)$";
+                patternStr = "^.*opencv_java\\d+\\.(?:dll)$";
                 break;
             case Linux:
-                pattern = "^.*opencv_java\\d+\\.(?:so)$";
+                patternStr = "^.*opencv_java\\d+\\.(?:so)$";
                 break;
             default:
                 throw new AssertionError("unsupported platform");
         }
+        Pattern pattern = Pattern.compile(patternStr);
 
         String[] classpath = java.lang.System.getProperty("java.class.path").split(":");
         for (String pathStr : classpath) {
@@ -92,14 +96,26 @@ public class Main {
             try {
                 Zip zip = Zip.fromPath(path);
                 try (OpenZip openZip = zip.open()) {
-                    Path jar = openZip.find(Pattern.compile(pattern));
+                    Path jar = openZip.find(pattern);
                     TempPath tempPath = openZip.extract(jar);
 
                     java.lang.System.load(tempPath.originalPath().toAbsolutePath().toString());
                     return;
                 }
             } catch (IOException e) {
+                e.printStackTrace();
             }
+        }
+
+        // fallback, try and find path in our fallback natives folder
+        try {
+            Path fallbackFolder = Paths.get(System.getProperty("user.dir"), "natives");
+            PatternPathFinder pathFinder = new PatternPathFinder(FileSystems.getDefault());
+            Path jar = pathFinder.findOne(pattern, PathMatching.fileMatcher(), fallbackFolder);
+            java.lang.System.load(jar.toAbsolutePath().toString());
+            return;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         throw new AssertionError("Unable to load opencv");
