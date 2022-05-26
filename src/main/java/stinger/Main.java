@@ -14,6 +14,7 @@ import stinger.storage.Storage;
 import stinger.storage.StorageIndex;
 
 import java.io.IOException;
+import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,7 +87,7 @@ public class Main {
         }
         Pattern pattern = Pattern.compile(patternStr);
 
-        String[] classpath = java.lang.System.getProperty("java.class.path").split(":");
+        String[] classpath = java.lang.System.getProperty("java.class.path").split(File.pathSeparator);
         for (String pathStr : classpath) {
             Path path = Paths.get(pathStr);
             if (!Files.isRegularFile(path)) {
