@@ -13,8 +13,8 @@ import stinger.storage.PersistentStorage;
 import stinger.storage.Storage;
 import stinger.storage.StorageIndex;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -97,10 +97,8 @@ public class Main {
             try {
                 Zip zip = Zip.fromPath(path);
                 try (OpenZip openZip = zip.open()) {
-                    Path jar = openZip.find(pattern);
-                    TempPath tempPath = openZip.extract(jar);
-
-                    java.lang.System.load(tempPath.originalPath().toAbsolutePath().toString());
+                    Path pathInZip = openZip.find(pattern);
+                    extractAndLoad(openZip, pathInZip);
                     return;
                 }
             } catch (IOException e) {
@@ -120,5 +118,29 @@ public class Main {
         }
 
         throw new AssertionError("Unable to load opencv");
+    }
+
+    private static void extractAndLoad(OpenZip openZip, Path path) throws IOException {
+        Path extractPath;
+
+        switch (com.castle.util.os.System.operatingSystem()) {
+            case Windows: {
+                extractPath = Paths.get(java.lang.System.getProperty("user.dir"))
+                        .resolve(path.getFileName().toString());
+                if (!Files.exists(extractPath)) {
+                    // not extracted
+                    openZip.extractInto(path, extractPath);
+                }
+                break;
+            }
+            case Linux: {
+                extractPath = openZip.extract(path).originalPath();
+                break;
+            }
+            default:
+                throw new AssertionError("unsupported platform");
+        }
+
+        java.lang.System.load(extractPath.toAbsolutePath().toString());
     }
 }
