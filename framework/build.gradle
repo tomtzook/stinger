@@ -1,0 +1,16 @@
+plugins {
+    id "java-library"
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+def CASTLE_VERSION = '1.0.0-dev.3'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    api group: 'com.github.tomtzook', name: 'castle', version: CASTLE_VERSION
+}

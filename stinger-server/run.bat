@@ -1,1 +1,0 @@
-call bin\stinger-server.bat
