@@ -1,12 +1,13 @@
-package stinger;
+package stinger.modules;
 
+import stinger.StingerEnvironment;
 import stingerlib.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
-public abstract class TaskModule implements Module {
+public abstract class TaskModule implements InternalModule {
 
     private final ExecutorService mExecutorService;
     private final BiFunction<Runnable, StingerEnvironment, Runnable> mTaskWrapper;
@@ -46,6 +47,7 @@ public abstract class TaskModule implements Module {
         }
     }
 
+    @Override
     public boolean isRunning() {
         return mFuture != null;
     }

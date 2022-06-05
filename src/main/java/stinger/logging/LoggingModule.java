@@ -1,7 +1,7 @@
 package stinger.logging;
 
 import stinger.Constants;
-import stinger.PeriodicTaskModule;
+import stinger.modules.PeriodicTaskModule;
 import stinger.StingerEnvironment;
 import stingerlib.logging.Logger;
 import stingerlib.storage.Product;

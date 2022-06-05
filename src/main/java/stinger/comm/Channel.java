@@ -1,7 +1,6 @@
 package stinger.comm;
 
-import stinger.commands.Command;
-import stinger.commands.Executable;
+import stinger.commands.StCommandDefinition;
 import stinger.commands.StandardCommandType;
 import stinger.storage.StandardProductType;
 import stingerlib.commands.CommandDefinition;
@@ -45,27 +44,26 @@ public class Channel implements Closeable {
         mProductSerializer.serialize(mOutput, product);
     }
 
-    public List<Executable> readCommands() throws IOException {
+    public List<StCommandDefinition> readCommands() throws IOException {
         mOutput.writeInt(MessageType.REQUEST_COMMANDS.intValue());
         int commandCount = mInput.readInt();
-        List<Executable> commands = new ArrayList<>();
+        List<StCommandDefinition> commands = new ArrayList<>();
         for (int i = 0; i < commandCount; i++) {
-            Executable executable = readCommand();
+            StCommandDefinition executable = readCommand();
             commands.add(executable);
         }
 
         return commands;
     }
 
-    private Executable readCommand() throws IOException {
+    private StCommandDefinition readCommand() throws IOException {
         CommandDefinition commandDefinition = mCommandSerializer.deserialize(mInput);
         CommandType commandType = commandDefinition.getType();
         if (!(commandType instanceof StandardCommandType)) {
             throw new IOException("unknown command type");
         }
 
-        Command command = ((StandardCommandType)commandType).createCommand();
-        return new Executable(command, commandDefinition.getParameters());
+        return new StCommandDefinition((StandardCommandType) commandType, commandDefinition.getParameters());
     }
 
     @Override

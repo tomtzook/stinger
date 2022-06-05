@@ -7,22 +7,16 @@ import stingerlib.commands.Parameters;
 public class Executable {
 
     private final Command mCommand;
+    private final CommandConfig mConfig;
     private final Parameters mParameters;
 
-    public Executable(Command command, Parameters parameters) {
+    public Executable(Command command, CommandConfig config, Parameters parameters) {
         mCommand = command;
+        mConfig = config;
         mParameters = parameters;
     }
 
     public void execute(StingerEnvironment environment) throws CommandException {
-        mCommand.execute(environment, mParameters);
-    }
-
-    @Override
-    public String toString() {
-        return "Executable{" +
-                "mCommand=" + mCommand.getClass().getName() +
-                ", mParameters=" + mParameters +
-                '}';
+        mCommand.execute(environment, mConfig, mParameters);
     }
 }

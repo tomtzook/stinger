@@ -1,14 +1,13 @@
 package stinger.comm;
 
 import stinger.Constants;
-import stinger.Module;
-import stinger.PeriodicTaskModule;
+import stinger.commands.CommandModule;
+import stinger.modules.PeriodicTaskModule;
 import stinger.StingerEnvironment;
 import stingerlib.logging.Logger;
 import stingerlib.net.CommunicationException;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class CommunicationModule extends PeriodicTaskModule {
 
@@ -45,7 +44,8 @@ public class CommunicationModule extends PeriodicTaskModule {
             try {
                 mLogger.info("Starting transaction");
                 TransactionResult result = mCommunicator.doTransaction(mEnvironment);
-                mEnvironment.getCommandQueue().addCommands(result.getCommands());
+                mEnvironment.getModules().get(CommandModule.class)
+                        .addCommandDefinitions(result.getCommands());
             } catch (CommunicationException e) {
                 mLogger.error("Transaction error", e);
             } catch (Throwable t) {

@@ -48,12 +48,13 @@ public class StorageIndex {
         }
     }
 
-    public void addProduct(InFileStoredProduct product) throws StorageException {
+    public void addProduct(InFileStoredProduct product, String creatorId) throws StorageException {
         try {
-            mDatabase.update("INSERT INTO pros (prid, type, path) VALUES (?,?,?)",
+            mDatabase.update("INSERT INTO pros (prid, type, path) VALUES (?,?,?,?)",
                     product.getId(),
                     product.getType().intValue(),
-                    product.getDataPath().toAbsolutePath().toString());
+                    product.getDataPath().toAbsolutePath().toString(),
+                    creatorId);
         } catch (DatabaseException e) {
             throw new StorageException(e);
         }
@@ -106,10 +107,11 @@ public class StorageIndex {
     }
 
     private void createTable() throws DatabaseException {
-        mDatabase.update(String.format("CREATE TABLE IF NOT EXISTS pros (%s,%s,%s)",
+        mDatabase.update(String.format("CREATE TABLE IF NOT EXISTS pros (%s,%s,%s,%s)",
                 "prid NVARCHAR UNIQUE NOT NULL",
                 "type INT NOT NULL",
-                "path NVARCHAR NOT NULL"));
+                "path NVARCHAR NOT NULL",
+                "creator_id NVARCHAR NULL"));
     }
 
     private void remove(InFileStoredProduct product) {

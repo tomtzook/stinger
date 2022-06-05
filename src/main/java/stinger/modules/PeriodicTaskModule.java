@@ -1,5 +1,6 @@
-package stinger;
+package stinger.modules;
 
+import stinger.StingerEnvironment;
 import stingerlib.logging.Logger;
 
 import java.util.concurrent.ExecutorService;

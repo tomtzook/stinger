@@ -6,5 +6,6 @@ import stingerlib.commands.Parameters;
 
 public interface Command {
 
-    void execute(StingerEnvironment environment, Parameters parameters) throws CommandException;
+    void execute(StingerEnvironment environment, CommandConfig config, Parameters parameters)
+            throws CommandException;
 }

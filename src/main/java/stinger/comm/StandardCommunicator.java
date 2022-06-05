@@ -2,6 +2,7 @@ package stinger.comm;
 
 import stinger.StingerEnvironment;
 import stinger.commands.Executable;
+import stinger.commands.StCommandDefinition;
 import stingerlib.logging.Logger;
 import stingerlib.net.CommunicationException;
 import stingerlib.net.Connector;
@@ -33,7 +34,7 @@ public class StandardCommunicator implements Communicator {
         logger.info("Opening transaction channel");
         try (Channel channel = openChannel(environment)) {
             logger.info("Reading commands");
-            List<Executable> commands = channel.readCommands();
+            List<StCommandDefinition> commands = channel.readCommands();
             logger.info("New commands %s", commands.toString());
 
             logger.info("Sending products");

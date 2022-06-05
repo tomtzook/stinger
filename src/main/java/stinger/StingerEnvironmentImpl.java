@@ -1,34 +1,35 @@
 package stinger;
 
-import stinger.commands.CommandQueue;
-import stingerlib.logging.Logger;
+import stinger.modules.ModuleCreator;
+import stinger.modules.StingerModuleImpl;
+import stinger.modules.StingerModules;
 import stinger.storage.Storage;
+import stingerlib.logging.Logger;
+
+import java.util.concurrent.ExecutorService;
 
 public class StingerEnvironmentImpl implements StingerEnvironment {
 
     private final Storage mStorage;
-    private final CommandQueue mCommandQueue;
     private final Logger mLogger;
     private final StingerControl mControl;
     private final StingerModules mModules;
+    private final ModuleCreator mModuleCreator;
 
-    public StingerEnvironmentImpl(Storage storage, CommandQueue commandQueue, Logger logger,
-                                  StingerControl control, StingerModules modules) {
+    public StingerEnvironmentImpl(ExecutorService executorService,
+                                  Storage storage,
+                                  Logger logger,
+                                  StingerControl control) {
         mStorage = storage;
-        mCommandQueue = commandQueue;
         mLogger = logger;
         mControl = control;
-        mModules = modules;
+        mModules = new StingerModuleImpl(this);
+        mModuleCreator = new ModuleCreator(executorService, mModules);
     }
 
     @Override
     public Storage getStorage() {
         return mStorage;
-    }
-
-    @Override
-    public CommandQueue getCommandQueue() {
-        return mCommandQueue;
     }
 
     @Override
@@ -44,5 +45,10 @@ public class StingerEnvironmentImpl implements StingerEnvironment {
     @Override
     public StingerModules getModules() {
         return mModules;
+    }
+
+    @Override
+    public ModuleCreator getModuleCreator() {
+        return mModuleCreator;
     }
 }

@@ -1,5 +1,6 @@
 package stinger.storage;
 
+import stinger.commands.CommandConfig;
 import stingerlib.storage.InFileStoredProduct;
 import stingerlib.storage.Product;
 import stingerlib.storage.StorageException;
@@ -24,9 +25,16 @@ public class PersistentStorage implements Storage {
 
     @Override
     public String store(Product product) throws StorageException {
+        return store(null, product);
+    }
+
+    @Override
+    public String store(CommandConfig creator, Product product) throws StorageException {
         try {
             InFileStoredProduct storedProduct = storeNew(product);
-            mStorageIndex.addProduct(storedProduct);
+            mStorageIndex.addProduct(
+                    storedProduct,
+                    creator != null ? creator.getId() : null);
             return storedProduct.getId();
         } catch (IOException e) {
             throw new StorageException(e);

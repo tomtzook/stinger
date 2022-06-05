@@ -1,18 +1,19 @@
 package stinger.comm;
 
 import stinger.commands.Executable;
+import stinger.commands.StCommandDefinition;
 
 import java.util.List;
 
 public class TransactionResult {
 
-    private final List<Executable> mCommands;
+    private final List<StCommandDefinition> mCommands;
 
-    public TransactionResult(List<Executable> commands) {
+    public TransactionResult(List<StCommandDefinition> commands) {
         mCommands = commands;
     }
 
-    public List<Executable> getCommands() {
+    public List<StCommandDefinition> getCommands() {
         return mCommands;
     }
 }

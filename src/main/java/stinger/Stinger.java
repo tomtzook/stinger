@@ -1,31 +1,27 @@
 package stinger;
 
+import stinger.modules.Module;
+import stinger.modules.StingerModules;
 import stingerlib.logging.Logger;
 
 import java.util.Set;
 
 public class Stinger {
 
-    private final Set<Module> mModules;
-    private final Set<Module> mModulesNotToStart;
     private final StingerEnvironment mEnvironment;
 
-    public Stinger(Set<Module> modules, Set<Module> modulesNotToStart, StingerEnvironment environment) {
-        mModules = modules;
-        mModulesNotToStart = modulesNotToStart;
+    public Stinger(StingerEnvironment environment) {
         mEnvironment = environment;
     }
 
-    public void start() {
+    public void start(Set<Class<? extends Module>> startModules) {
         Logger logger = mEnvironment.getLogger();
         logger.info("Stinger start");
 
-        for (Module module : mModules) {
-            logger.info("Starting module %s", module.getClass().getName());
-            module.start(mEnvironment);
+        StingerModules modules = mEnvironment.getModules();
+        for (Class<? extends Module> module : startModules) {
+            modules.start(module);
         }
-        mModules.addAll(mModulesNotToStart);
-        mModulesNotToStart.clear();
 
         OnStart.onStart(mEnvironment);
 
@@ -41,9 +37,9 @@ public class Stinger {
     public void stop() {
         Logger logger = mEnvironment.getLogger();
 
-        for (Module module : mModules) {
-            logger.info("Stopping module %s", module.getClass().getName());
-            module.stop(mEnvironment);
+        StingerModules modules = mEnvironment.getModules();
+        for (Module module : mEnvironment.getModules().getAll()) {
+            modules.stop(module.getClass());
         }
 
         logger.info("Stinger stop");

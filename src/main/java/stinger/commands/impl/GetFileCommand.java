@@ -2,6 +2,7 @@ package stinger.commands.impl;
 
 import stinger.StingerEnvironment;
 import stinger.commands.Command;
+import stinger.commands.CommandConfig;
 import stinger.storage.Storage;
 import stinger.storage.impl.FileProduct;
 import stingerlib.commands.CommandException;
@@ -16,7 +17,7 @@ import java.nio.file.Paths;
 public class GetFileCommand implements Command {
 
     @Override
-    public void execute(StingerEnvironment environment, Parameters parameters) throws CommandException {
+    public void execute(StingerEnvironment environment, CommandConfig config, Parameters parameters) throws CommandException {
         try {
             String pathStr = parameters.getString("path");
             Path path = Paths.get(pathStr);

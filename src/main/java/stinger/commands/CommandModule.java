@@ -1,10 +1,12 @@
 package stinger.commands;
 
 import stinger.StingerEnvironment;
-import stinger.TaskModule;
+import stinger.modules.TaskModule;
+import stingerlib.commands.Parameters;
 import stingerlib.logging.Logger;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -21,20 +23,32 @@ public class CommandModule extends TaskModule implements CommandQueue {
     }
 
     @Override
-    public void addCommand(Executable executable) {
-        mLogger.info("Adding command %s", executable.toString());
-        mCommandQueue.add(executable);
+    public void addCommand(Command command, Parameters parameters) {
+        mLogger.info("Adding command %s", command.getClass().getSimpleName());
+        mCommandQueue.add(new Executable(
+                command,
+                createConfig(),
+                parameters
+        ));
     }
 
     @Override
-    public void addCommands(Collection<? extends Executable> executables) {
-        mLogger.info("Adding commands %s", executables.toString());
-        mCommandQueue.addAll(executables);
+    public void addCommandDefinitions(Collection<? extends StCommandDefinition> definitions) {
+        for (StCommandDefinition def : definitions) {
+            Command command = def.getType().createCommand();
+            addCommand(command, def.getParameters());
+        }
     }
 
     @Override
     protected Runnable createTask(StingerEnvironment environment) {
         return new Task(mCommandQueue, environment, mLogger);
+    }
+
+    private CommandConfig createConfig() {
+        return new CommandConfig(
+                UUID.randomUUID().toString()
+        );
     }
 
     private static class Task implements Runnable {
