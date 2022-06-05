@@ -41,7 +41,7 @@ public class StandardCommunicator implements Communicator {
             Iterator<StoredProduct> productIterator = environment.getStorage().storedProducts();
             while (productIterator.hasNext()) {
                 StoredProduct product = productIterator.next();
-                logger.info("Sending product %s", product.getId());
+                logger.info("Sending product %s", product.getMetadata().getId());
                 channel.sendProduct(product);
                 productIterator.remove();
             }

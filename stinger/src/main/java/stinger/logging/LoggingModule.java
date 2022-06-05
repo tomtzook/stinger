@@ -6,6 +6,7 @@ import stinger.StingerEnvironment;
 import com.stinger.framework.logging.Logger;
 import com.stinger.framework.storage.Product;
 import com.stinger.framework.storage.StorageException;
+import stinger.storage.StandardProductType;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -48,7 +49,7 @@ public class LoggingModule extends PeriodicTaskModule {
                     mLogger.info("Doing rotation");
                     Product product = mLoggerControl.rotate();
                     mLastRotateMs = System.currentTimeMillis();
-                    mStingerEnvironment.getStorage().store(product);
+                    mStingerEnvironment.getStorage().store(StandardProductType.LOG, product);
                 } catch (IOException | StorageException e) {
                     mLogger.error("LoggerModule Rotation", e);
                 }

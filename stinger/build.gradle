@@ -23,6 +23,7 @@ dependencies {
     implementation project(':framework')
 
     implementation 'com.github.tomtzook:castle:1.0.0'
+    implementation "com.google.code.gson:gson:2.8.5"
     implementation group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
     runtimeOnly group: 'org.xerial', name: 'sqlite-jdbc', version: '3.14.2'
 

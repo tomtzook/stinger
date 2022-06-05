@@ -6,24 +6,17 @@ import java.io.InputStream;
 
 public class InMemoryStoredProduct implements StoredProduct {
 
-    private final String mId;
-    private final ProductType mProductType;
+    private final ProductMetadata mMetadata;
     private final byte[] mData;
 
-    public InMemoryStoredProduct(String id, ProductType productType, byte[] data) {
-        mId = id;
-        mProductType = productType;
+    public InMemoryStoredProduct(ProductMetadata metadata, byte[] data) {
+        mMetadata = metadata;
         mData = data;
     }
 
     @Override
-    public String getId() {
-        return mId;
-    }
-
-    @Override
-    public ProductType getType() {
-        return mProductType;
+    public ProductMetadata getMetadata() {
+        return mMetadata;
     }
 
     @Override

@@ -1,9 +1,7 @@
 package stinger.storage.impl;
 
 
-import stinger.storage.StandardProductType;
 import com.stinger.framework.storage.Product;
-import com.stinger.framework.storage.ProductType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,28 +12,13 @@ import java.nio.file.Path;
 public class FileProduct implements Product {
 
     private final Path mPath;
-    private final ProductType mProductType;
-
-    public FileProduct(Path path, ProductType productType) {
-        mPath = path;
-        mProductType = productType;
-    }
-
-    public FileProduct(File file, ProductType productType) {
-        this(file.toPath(), productType);
-    }
 
     public FileProduct(Path path) {
-        this(path, StandardProductType.FILE);
+        mPath = path;
     }
 
     public FileProduct(File file) {
         this(file.toPath());
-    }
-
-    @Override
-    public ProductType getType() {
-        return mProductType;
     }
 
     @Override

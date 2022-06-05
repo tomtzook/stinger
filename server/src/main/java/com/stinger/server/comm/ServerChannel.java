@@ -83,7 +83,9 @@ public class ServerChannel implements Closeable {
 
     private StoredProduct readProduct() throws IOException {
         StoredProduct product = mProductSerializer.deserialize(mInput);
-        mLogger.info("Received product %s (%s)", product.getId(), product.getType());
+        mLogger.info("Received product %s (%s)",
+                product.getMetadata().getId(),
+                product.getMetadata().getType());
         return product;
     }
 

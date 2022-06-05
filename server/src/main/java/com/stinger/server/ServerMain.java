@@ -1,5 +1,6 @@
 package com.stinger.server;
 
+import com.stinger.framework.storage.ProductJsonSerializer;
 import com.stinger.server.comm.CommunicationModule;
 import com.stinger.server.comm.Communicator;
 import com.stinger.server.commands.CommandQueue;
@@ -30,7 +31,8 @@ public class ServerMain {
                             .parseFromFile(files.getProductTypesFile());
 
             CommandQueue commandQueue = new CommandQueue();
-            Storage storage = new Storage(files.getStorageRoot(), logger);
+            Storage storage = new Storage(files.getStorageRoot(), logger,
+                    new ProductJsonSerializer(knownProductTypes::getFromKey));
 
             CommunicationModule communicationModule = new CommunicationModule(
                     executorService, new Communicator(Constants.COMMUNICATION_BIND_ADDRESS));

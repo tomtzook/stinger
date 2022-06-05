@@ -5,7 +5,5 @@ import java.io.InputStream;
 
 public interface Product {
 
-    ProductType getType();
-
     InputStream open() throws IOException;
 }

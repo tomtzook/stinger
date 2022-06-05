@@ -3,6 +3,7 @@ package stinger.commands.impl;
 import stinger.StingerEnvironment;
 import stinger.commands.Command;
 import stinger.commands.CommandConfig;
+import stinger.storage.StandardProductType;
 import stinger.storage.Storage;
 import stinger.storage.impl.FileProduct;
 import com.stinger.framework.commands.CommandException;
@@ -23,7 +24,7 @@ public class GetFileCommand implements Command {
             Path path = Paths.get(pathStr);
 
             Storage storage = environment.getStorage();
-            storage.store(new FileProduct(path));
+            storage.store(StandardProductType.FILE, new FileProduct(path));
         } catch (StorageException e) {
             throw new CommandException(e);
         }

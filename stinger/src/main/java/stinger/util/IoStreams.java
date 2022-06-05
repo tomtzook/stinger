@@ -4,6 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 
 public class IoStreams {
 
@@ -18,6 +21,14 @@ public class IoStreams {
         int readBytes;
         while ((readBytes = source.read(buffer)) > 0) {
             destination.write(buffer, 0, readBytes);
+        }
+    }
+
+    public static void copy(ReadableByteChannel in, WritableByteChannel out) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+
+        while (in.read(buffer) > 0) {
+            out.write(buffer);
         }
     }
 

@@ -7,24 +7,17 @@ import java.nio.file.Path;
 
 public class InFileStoredProduct implements StoredProduct {
 
-    private final String mId;
-    private final ProductType mProductType;
+    private final ProductMetadata mMetadata;
     private final Path mDataPath;
 
-    public InFileStoredProduct(String id, ProductType productType, Path dataPath) {
-        mId = id;
-        mProductType = productType;
+    public InFileStoredProduct(ProductMetadata metadata, Path dataPath) {
+        mMetadata = metadata;
         mDataPath = dataPath;
     }
 
     @Override
-    public String getId() {
-        return mId;
-    }
-
-    @Override
-    public ProductType getType() {
-        return mProductType;
+    public ProductMetadata getMetadata() {
+        return mMetadata;
     }
 
     @Override
