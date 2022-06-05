@@ -50,9 +50,18 @@ public class PersistentStorage implements Storage {
 
     @Override
     public String store(ProductType type, Product product) throws StorageException {
+        return store(null, type, product);
+    }
+
+    @Override
+    public String store(CommandConfig creatingCommand, ProductType type, Product product) throws StorageException {
         try (ProductTransaction transaction = newTransaction(type);
              InputStream productStream = product.open();
              ReadableByteChannel inChannel = Channels.newChannel(productStream)) {
+            if (creatingCommand != null) {
+                transaction.getMetadata().putProperty("commandId", creatingCommand.getId());
+            }
+
             IoStreams.copy(inChannel, transaction);
             transaction.commit();
 

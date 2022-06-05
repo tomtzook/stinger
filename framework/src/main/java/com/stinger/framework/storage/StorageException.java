@@ -1,6 +1,8 @@
 package com.stinger.framework.storage;
 
-public class StorageException extends Exception {
+import java.io.IOException;
+
+public class StorageException extends IOException {
 
     public StorageException(String message) {
         super(message);

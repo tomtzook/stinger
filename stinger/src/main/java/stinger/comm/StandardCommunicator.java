@@ -48,7 +48,7 @@ public class StandardCommunicator implements Communicator {
 
             logger.info("Transaction finished");
             return new TransactionResult(commands);
-        } catch (StorageException | IOException e) {
+        } catch (IOException e) {
             throw new CommunicationException(e);
         }
     }

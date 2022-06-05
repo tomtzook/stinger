@@ -50,7 +50,7 @@ public class LoggingModule extends PeriodicTaskModule {
                     Product product = mLoggerControl.rotate();
                     mLastRotateMs = System.currentTimeMillis();
                     mStingerEnvironment.getStorage().store(StandardProductType.LOG, product);
-                } catch (IOException | StorageException e) {
+                } catch (IOException e) {
                     mLogger.error("LoggerModule Rotation", e);
                 }
             }
