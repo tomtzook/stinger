@@ -56,6 +56,7 @@ public class ProductSerializer extends TypedSerializer {
         output.writeUTF(metadata.getId());
         output.writeInt(metadata.getType().intValue());
         output.writeInt(metadata.getPriority());
+        output.writeLong(metadata.getContentSize());
         writeTypedMap(output, metadata.getAllProperties());
     }
 
@@ -88,8 +89,9 @@ public class ProductSerializer extends TypedSerializer {
         int typeInt = input.readInt();
         ProductType productType = mProductClassifier.apply(typeInt);
         int priority = input.readInt();
+        long contentSize = input.readLong();
         Map<String, Object> properties = readTypedMap(input);
 
-        return new GenericProductMetadata(id, productType, priority, properties);
+        return new GenericProductMetadata(id, productType, priority, contentSize, properties);
     }
 }

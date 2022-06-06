@@ -29,13 +29,14 @@ public class PersistentProductTransaction implements ProductTransaction {
     }
 
     @Override
-    public WritableProductMetadata getMetadata() {
-        return mMetadata;
+    public void putMetadataProperty(String name, Object value) {
+        mMetadata.putProperty(name, value);
     }
 
     @Override
     public void commit() throws StorageException {
         try {
+            mMetadata.setContentSize(mChannel.size());
             mChannel.close();
         } catch (IOException e) {
             throw new StorageException(e);

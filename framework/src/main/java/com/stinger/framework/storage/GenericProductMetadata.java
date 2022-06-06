@@ -4,25 +4,30 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 public class GenericProductMetadata implements ProductMetadata {
 
     private final String mId;
     private final ProductType mType;
     private final int mPriority;
+    protected long mContentSize;
     private final Map<String, Object> mProperties;
 
-    public GenericProductMetadata(String id, ProductType type, int priority,
+    public GenericProductMetadata(String id, ProductType type,
+                                  int priority,
+                                  long contentSize,
                                   Map<String, Object> properties) {
         mId = id;
         mType = type;
         mPriority = priority;
+        mContentSize = contentSize;
         mProperties = properties;
     }
 
-    public GenericProductMetadata(String id, int priority, ProductType type) {
-        this(id, type, priority, new HashMap<>());
+    public GenericProductMetadata(String id, ProductType type,
+                                  int priority,
+                                  long contentSize) {
+        this(id, type, priority, contentSize, new HashMap<>());
     }
 
     @Override
@@ -38,6 +43,11 @@ public class GenericProductMetadata implements ProductMetadata {
     @Override
     public int getPriority() {
         return mPriority;
+    }
+
+    @Override
+    public long getContentSize() {
+        return mContentSize;
     }
 
     @Override

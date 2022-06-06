@@ -8,7 +8,7 @@ import java.nio.channels.WritableByteChannel;
 
 public interface ProductTransaction extends WritableByteChannel, Closeable {
 
-    WritableProductMetadata getMetadata();
+    void putMetadataProperty(String name, Object value);
 
     void commit() throws StorageException;
 }
