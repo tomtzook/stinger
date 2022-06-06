@@ -1,5 +1,6 @@
 package com.stinger.framework.storage;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -64,7 +65,7 @@ public class GenericProductMetadata implements ProductMetadata {
     }
 
     @Override
-    public Set<String> getAllPropertyNames() {
-        return mProperties.keySet();
+    public Map<String, Object> getAllProperties() {
+        return Collections.unmodifiableMap(mProperties);
     }
 }

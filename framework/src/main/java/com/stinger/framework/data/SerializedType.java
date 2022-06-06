@@ -1,4 +1,4 @@
-package com.stinger.framework.storage;
+package com.stinger.framework.data;
 
 public enum SerializedType {
     NULL(0),

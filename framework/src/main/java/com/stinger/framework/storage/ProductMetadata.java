@@ -1,6 +1,6 @@
 package com.stinger.framework.storage;
 
-import java.util.Set;
+import java.util.Map;
 
 public interface ProductMetadata {
 
@@ -11,5 +11,5 @@ public interface ProductMetadata {
     Object getProperty(String name);
     <T> T getProperty(String name, Class<T> type);
     boolean hasProperty(String name);
-    Set<String> getAllPropertyNames();
+    Map<String, Object> getAllProperties();
 }

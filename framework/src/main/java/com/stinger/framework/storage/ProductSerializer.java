@@ -1,5 +1,6 @@
 package com.stinger.framework.storage;
 
+import com.stinger.framework.data.TypedSerializer;
 import com.stinger.framework.util.IoStreams;
 
 import java.io.ByteArrayInputStream;
@@ -10,12 +11,10 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
-public class ProductSerializer {
+public class ProductSerializer extends TypedSerializer {
 
     private final Function<Integer, ProductType> mProductClassifier;
 
@@ -57,15 +56,7 @@ public class ProductSerializer {
         output.writeUTF(metadata.getId());
         output.writeInt(metadata.getType().intValue());
         output.writeInt(metadata.getPriority());
-
-        Set<String> propertyNames = metadata.getAllPropertyNames();
-        output.writeInt(propertyNames.size());
-
-        for (String name : propertyNames) {
-            Object value = metadata.getProperty(name);
-            output.writeUTF(name);
-            serializeTyped(output, value);
-        }
+        writeTypedMap(output, metadata.getAllProperties());
     }
 
     public StoredProduct deserialize(byte[] data) throws IOException {
@@ -97,50 +88,8 @@ public class ProductSerializer {
         int typeInt = input.readInt();
         ProductType productType = mProductClassifier.apply(typeInt);
         int priority = input.readInt();
-
-        Map<String, Object> properties = new HashMap<>();
-        int propertyCount = input.readInt();
-        for (int i = 0; i < propertyCount; i++) {
-            String name = input.readUTF();
-            Object value = readTyped(input);
-
-            properties.put(name, value);
-        }
+        Map<String, Object> properties = readTypedMap(input);
 
         return new GenericProductMetadata(id, productType, priority, properties);
-    }
-
-    private void serializeTyped(DataOutput output, Object value) throws IOException {
-        if (value == null) {
-            output.writeInt(SerializedType.NULL.intValue());
-        } else if (value instanceof Integer) {
-            output.writeInt(SerializedType.INTEGER.intValue());
-            output.writeInt((Integer) value);
-        } else if (value instanceof Double) {
-            output.writeInt(SerializedType.DOUBLE.intValue());
-            output.writeDouble((Double) value);
-        } else if (value instanceof String) {
-            output.writeInt(SerializedType.STRING.intValue());
-            output.writeUTF((String) value);
-        } else if (value instanceof Boolean) {
-            output.writeInt(SerializedType.BOOLEAN.intValue());
-            output.writeBoolean((Boolean) value);
-        } else {
-            throw new IOException("unsupported type: " + value.getClass().getName());
-        }
-    }
-
-    private Object readTyped(DataInput input) throws IOException {
-        int typeInt = input.readInt();
-        SerializedType type = SerializedType.fromInt(typeInt);
-
-        switch (type) {
-            case NULL: return null;
-            case INTEGER: return input.readInt();
-            case DOUBLE: return input.readDouble();
-            case STRING: return input.readUTF();
-            case BOOLEAN: return input.readBoolean();
-            default: throw new IOException("unsupported type: " + type.name());
-        }
     }
 }

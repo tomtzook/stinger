@@ -3,13 +3,13 @@ package com.stinger.framework.storage;
 import com.google.gson.JsonElement;
 import com.google.gson.internal.bind.JsonTreeReader;
 import com.google.gson.internal.bind.JsonTreeWriter;
+import com.stinger.framework.data.TypedJsonSerializer;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class ProductJsonSerializer {
+public class ProductJsonSerializer extends TypedJsonSerializer {
 
     private final Function<Integer, ProductType> mProductClassifier;
 
@@ -17,7 +17,7 @@ public class ProductJsonSerializer {
         mProductClassifier = productClassifier;
     }
 
-    public JsonElement serialize(ProductMetadata metadata) throws IOException {
+    public JsonElement serializeMetadata(ProductMetadata metadata) throws IOException {
         try (JsonTreeWriter writer = new JsonTreeWriter()) {
             writer.beginObject();
             writer.name("id").value(metadata.getId());
@@ -25,14 +25,14 @@ public class ProductJsonSerializer {
             writer.name("typeInt").value(metadata.getType().intValue());
             writer.name("priority").value(metadata.getPriority());
             writer.name("props");
-            writeProps(writer, metadata);
+            writeTypedMap(writer, metadata.getAllProperties());
             writer.endObject();
 
             return writer.get();
         }
     }
 
-    public ProductMetadata deserialize(JsonElement element) throws IOException {
+    public ProductMetadata deserializeMetadata(JsonElement element) throws IOException {
         try (JsonTreeReader reader = new JsonTreeReader(element)) {
             reader.beginObject();
 
@@ -47,111 +47,10 @@ public class ProductJsonSerializer {
             int priority = reader.nextInt();
 
             expectName(reader, "props");
-            Map<String, Object> props = readProps(reader);
+            Map<String, Object> props = readTypedMap(reader);
             reader.endObject();
 
             return new GenericProductMetadata(id, type, priority, props);
-        }
-    }
-
-    private void writeProps(JsonTreeWriter writer, ProductMetadata metadata) throws IOException {
-        writer.beginObject();
-        for (String name : metadata.getAllPropertyNames()) {
-            Object value = metadata.getProperty(name);
-
-            writer.name(name);
-            writeTyped(writer, value);
-        }
-        writer.endObject();
-    }
-
-    private Map<String, Object> readProps(JsonTreeReader reader) throws IOException {
-        Map<String, Object> props = new HashMap<>();
-
-        reader.beginObject();
-        while (reader.hasNext()) {
-            String name = reader.nextName();
-            Object value = readTyped(reader);
-            props.put(name, value);
-        }
-        reader.endObject();
-
-        return props;
-    }
-
-    private void writeTyped(JsonTreeWriter writer, Object value) throws IOException {
-        if (value == null) {
-            writer.beginObject();
-            writer.name("type").value(SerializedType.NULL.intValue());
-            writer.name("value").nullValue();
-            writer.endObject();
-        } else if (value instanceof Integer) {
-            writer.beginObject();
-            writer.name("type").value(SerializedType.INTEGER.intValue());
-            writer.name("value").value((Integer) value);
-            writer.endObject();
-        } else if (value instanceof Double) {
-            writer.beginObject();
-            writer.name("type").value(SerializedType.DOUBLE.intValue());
-            writer.name("value").value((Double) value);
-            writer.endObject();
-        } else if (value instanceof String) {
-            writer.beginObject();
-            writer.name("type").value(SerializedType.STRING.intValue());
-            writer.name("value").value((String) value);
-            writer.endObject();
-        } else if (value instanceof Boolean) {
-            writer.beginObject();
-            writer.name("type").value(SerializedType.BOOLEAN.intValue());
-            writer.name("value").value((Boolean) value);
-            writer.endObject();
-        } else {
-            throw new IOException("unsupported type: " + value.getClass().getName());
-        }
-    }
-
-    private Object readTyped(JsonTreeReader reader) throws IOException {
-        reader.beginObject();
-
-        expectName(reader, "type");
-        SerializedType type = SerializedType.fromInt(reader.nextInt());
-        expectName(reader, "value");
-
-        Object value;
-        switch (type) {
-            case NULL: {
-                reader.nextNull();
-                value = null;
-                break;
-            }
-            case INTEGER: {
-                value = reader.nextInt();
-                break;
-            }
-            case DOUBLE: {
-                value = reader.nextDouble();
-                break;
-            }
-            case STRING: {
-                value = reader.nextString();
-                break;
-            }
-            case BOOLEAN: {
-                value = reader.nextBoolean();
-                break;
-            }
-            default: throw new IOException("unsupported type: " + type.name());
-        }
-
-        reader.endObject();
-
-        return value;
-    }
-
-    private void expectName(JsonTreeReader reader, String expected) throws IOException {
-        String name = reader.nextName();
-        if (!name.equals(expected)) {
-            throw new IOException("expected '" + expected + "'");
         }
     }
 }

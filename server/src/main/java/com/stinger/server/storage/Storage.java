@@ -46,7 +46,7 @@ public class Storage {
     }
 
     private void saveMetadata(ProductMetadata metadata, Path file) throws IOException {
-        JsonElement element = mProductJsonSerializer.serialize(metadata);
+        JsonElement element = mProductJsonSerializer.serializeMetadata(metadata);
         Files.write(file, Collections.singleton(element.toString()),
                 StandardOpenOption.CREATE_NEW,
                 StandardOpenOption.TRUNCATE_EXISTING,

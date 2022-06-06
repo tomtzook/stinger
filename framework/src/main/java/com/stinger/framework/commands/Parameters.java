@@ -1,10 +1,10 @@
 package com.stinger.framework.commands;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-public class Parameters implements Iterable<Map.Entry<String, Object>> {
+public class Parameters {
 
     public static class Builder {
 
@@ -68,9 +68,8 @@ public class Parameters implements Iterable<Map.Entry<String, Object>> {
         return get(key, String.class);
     }
 
-    @Override
-    public Iterator<Map.Entry<String, Object>> iterator() {
-        return mParameters.entrySet().iterator();
+    public Map<String, Object> getAllParameters() {
+        return Collections.unmodifiableMap(mParameters);
     }
 
     @Override
