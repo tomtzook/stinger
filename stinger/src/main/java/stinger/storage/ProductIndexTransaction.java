@@ -49,7 +49,7 @@ public class ProductIndexTransaction implements Closeable {
 
     public void commit() throws StorageException {
         try {
-            byte[] metadata = mProductSerializer.serialize(mMetadata);
+            byte[] metadata = mProductSerializer.serializeMetadata(mMetadata);
             mModel.setMetadata(metadata);
             mModel.setCommited(true);
 

@@ -15,6 +15,7 @@ public class GenericTypesParser<T extends GenericType<KEY>, KEY> {
     private final Gson mGson;
 
     private GenericTypesParser(Object array) {
+        //noinspection unchecked
         mTypeClass = (Class<T[]>) array.getClass();
         mGson = new Gson();
     }

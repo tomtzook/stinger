@@ -43,7 +43,7 @@ public class ProductSerializer {
         }
     }
 
-    public byte[] serialize(ProductMetadata metadata) throws IOException {
+    public byte[] serializeMetadata(ProductMetadata metadata) throws IOException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              DataOutputStream dataOutputStream = new DataOutputStream(outputStream)) {
             serializeMetadata(dataOutputStream, metadata);

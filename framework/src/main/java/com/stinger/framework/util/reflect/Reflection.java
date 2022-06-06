@@ -9,12 +9,6 @@ import java.util.stream.Collectors;
 
 public class Reflection {
 
-    public static void setField(Object instance, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = instance.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(instance, value);
-    }
-
     public static Set<? extends Field> getFieldsWithAnnotation(Class<?> cls, Class<? extends Annotation> annotation) {
         Set<? extends Field> fields = getFields(cls);
         return fields.stream()
@@ -28,15 +22,5 @@ public class Reflection {
         fields.addAll(Arrays.asList(cls.getFields()));
 
         return fields;
-    }
-
-    public static <E extends Enum<?>> E[] getEnumValues(Class<E> enumClass)
-            throws NoSuchFieldException, IllegalAccessException {
-        Field field = enumClass.getDeclaredField("$VALUES");
-        field.setAccessible(true);
-
-        Object values = field.get(null);
-        //noinspection unchecked
-        return (E[]) values;
     }
 }

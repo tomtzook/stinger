@@ -24,8 +24,4 @@ public class InFileStoredProduct implements StoredProduct {
     public InputStream open() throws IOException {
         return new FileInputStream(mDataPath.toFile());
     }
-
-    public Path getDataPath() {
-        return mDataPath;
-    }
 }
