@@ -6,6 +6,7 @@ public interface ProductMetadata {
 
     String getId();
     ProductType getType();
+    int getPriority();
 
     Object getProperty(String name);
     <T> T getProperty(String name, Class<T> type);

@@ -9,6 +9,8 @@ public interface SelectQuery<T> {
     SelectQuery<T> where(String col, Object value);
     SelectQuery<T> whereNotNull(String col);
 
+    SelectQuery<T> orderBy(String col, boolean descending);
+
     List<T> getAll() throws IOException;
     Optional<T> getOne() throws IOException;
 }

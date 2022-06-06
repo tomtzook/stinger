@@ -10,9 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 
 public class FileLogger extends AbstractFileLogger implements LoggerControl {
 
@@ -47,6 +49,20 @@ public class FileLogger extends AbstractFileLogger implements LoggerControl {
         }
 
         return new FileProduct(oldFile);
+    }
+
+    @Override
+    public Optional<Product> rotateIf(Predicate<LoggerControl> predicate) throws IOException {
+        mLogLock.lock();
+        try {
+            if (predicate.test(this)) {
+                return Optional.of(rotate());
+            }
+
+            return Optional.empty();
+        } finally {
+            mLogLock.unlock();
+        }
     }
 
     @Override

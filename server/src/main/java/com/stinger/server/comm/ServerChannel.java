@@ -1,14 +1,14 @@
 package com.stinger.server.comm;
 
+import com.stinger.framework.commands.GenericCommandType;
+import com.stinger.framework.data.KnownTypes;
 import com.stinger.framework.net.StreamConnection;
-import com.stinger.server.commands.GenericCommandType;
-import com.stinger.server.storage.GenericProductType;
-import com.stinger.server.util.KnownTypes;
 import com.stinger.framework.commands.CommandDefinition;
 import com.stinger.framework.commands.CommandSerializer;
 import com.stinger.framework.commands.ParametersSerializer;
 import com.stinger.framework.logging.Logger;
 import com.stinger.framework.net.MessageType;
+import com.stinger.framework.storage.GenericProductType;
 import com.stinger.framework.storage.ProductSerializer;
 import com.stinger.framework.storage.StoredProduct;
 

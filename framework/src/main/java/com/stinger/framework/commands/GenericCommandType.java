@@ -1,14 +1,13 @@
-package com.stinger.server.storage;
+package com.stinger.framework.commands;
 
-import com.stinger.server.util.GenericType;
-import com.stinger.framework.storage.ProductType;
+import com.stinger.framework.data.GenericType;
 
-public class GenericProductType implements ProductType, GenericType<Integer> {
+public class GenericCommandType implements CommandType, GenericType<Integer> {
 
     private final String mName;
     private final int mIntValue;
 
-    public GenericProductType(String name, int intValue) {
+    public GenericCommandType(String name, int intValue) {
         mName = name;
         mIntValue = intValue;
     }
@@ -30,7 +29,7 @@ public class GenericProductType implements ProductType, GenericType<Integer> {
 
     @Override
     public String toString() {
-        return "GenericProductType{" +
+        return "GenericCommandType{" +
                 "mName='" + mName + '\'' +
                 ", mIntValue=" + mIntValue +
                 '}';

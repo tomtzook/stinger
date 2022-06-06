@@ -56,6 +56,7 @@ public class ProductSerializer {
     public void serializeMetadata(DataOutput output, ProductMetadata metadata) throws IOException {
         output.writeUTF(metadata.getId());
         output.writeInt(metadata.getType().intValue());
+        output.writeInt(metadata.getPriority());
 
         Set<String> propertyNames = metadata.getAllPropertyNames();
         output.writeInt(propertyNames.size());
@@ -95,6 +96,7 @@ public class ProductSerializer {
         String id = input.readUTF();
         int typeInt = input.readInt();
         ProductType productType = mProductClassifier.apply(typeInt);
+        int priority = input.readInt();
 
         Map<String, Object> properties = new HashMap<>();
         int propertyCount = input.readInt();
@@ -105,7 +107,7 @@ public class ProductSerializer {
             properties.put(name, value);
         }
 
-        return new GenericProductMetadata(id, productType, properties);
+        return new GenericProductMetadata(id, productType, priority, properties);
     }
 
     private void serializeTyped(DataOutput output, Object value) throws IOException {

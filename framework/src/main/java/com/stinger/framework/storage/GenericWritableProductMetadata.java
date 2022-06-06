@@ -8,13 +8,14 @@ public class GenericWritableProductMetadata extends GenericProductMetadata
 
     private final Map<String, Object> mProperties;
 
-    public GenericWritableProductMetadata(String id, ProductType type, Map<String, Object> properties) {
-        super(id, type, properties);
+    public GenericWritableProductMetadata(String id, ProductType type, int priority,
+                                          Map<String, Object> properties) {
+        super(id, type, priority, properties);
         mProperties = properties;
     }
 
-    public GenericWritableProductMetadata(String id, ProductType type) {
-        this(id, type, new HashMap<>());
+    public GenericWritableProductMetadata(String id, ProductType type, int priority) {
+        this(id, type, priority, new HashMap<>());
     }
 
     @Override

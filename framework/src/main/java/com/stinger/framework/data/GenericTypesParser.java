@@ -1,4 +1,4 @@
-package com.stinger.server.util;
+package com.stinger.framework.data;
 
 import com.google.gson.Gson;
 

@@ -1,10 +1,11 @@
 package com.stinger.server.commands;
 
 import com.google.gson.Gson;
-import com.stinger.server.util.KnownTypes;
 import com.stinger.framework.commands.CommandDefinition;
 import com.stinger.framework.commands.CommandType;
+import com.stinger.framework.commands.GenericCommandType;
 import com.stinger.framework.commands.Parameters;
+import com.stinger.framework.data.KnownTypes;
 import com.stinger.framework.logging.Logger;
 
 import java.io.IOException;

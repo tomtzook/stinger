@@ -1,7 +1,6 @@
 package com.stinger.server.storage;
 
 import com.google.gson.JsonElement;
-import com.google.gson.internal.bind.JsonTreeWriter;
 import com.stinger.framework.logging.Logger;
 import com.stinger.framework.storage.ProductJsonSerializer;
 import com.stinger.framework.storage.ProductMetadata;
@@ -27,10 +26,12 @@ public class Storage {
     }
 
     public void save(StoredProduct product) {
-        Path dataFile = mStorageDir.resolve(String.format("%s.%s",
+        Path dataFile = mStorageDir.resolve(String.format("%d.%s.%s",
+                product.getMetadata().getPriority(),
                 product.getMetadata().getId(),
                 product.getMetadata().getType().name()));
-        Path metaFile = mStorageDir.resolve(String.format("%s.%s.metadata",
+        Path metaFile = mStorageDir.resolve(String.format("%d.%s.%s.metadata",
+                product.getMetadata().getPriority(),
                 product.getMetadata().getId(),
                 product.getMetadata().getType().name()));
 

@@ -35,10 +35,11 @@ public class ProductIndexTransaction implements Closeable {
         try {
             mModel = new StoredProductModel();
             mModel.setProductId(metadata.getId());
-            mModel.setType((StandardProductType) metadata.getType());
+            mModel.setType(metadata.getType().intValue());
             mModel.setPath(dataPath.toAbsolutePath().toString());
             mModel.setMetadata(null);
             mModel.setCommited(false);
+            mModel.setPriority(metadata.getPriority());
 
             mTransaction.add(mModel);
         } catch (IOException e) {

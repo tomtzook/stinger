@@ -1,10 +1,10 @@
 package com.stinger.server;
 
+import com.stinger.framework.commands.GenericCommandType;
+import com.stinger.framework.data.KnownTypes;
+import com.stinger.framework.storage.GenericProductType;
 import com.stinger.server.commands.CommandQueue;
-import com.stinger.server.commands.GenericCommandType;
-import com.stinger.server.storage.GenericProductType;
 import com.stinger.server.storage.Storage;
-import com.stinger.server.util.KnownTypes;
 import com.stinger.framework.logging.Logger;
 
 public class Environment {

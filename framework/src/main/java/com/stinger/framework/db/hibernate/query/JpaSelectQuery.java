@@ -7,6 +7,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
@@ -44,6 +45,17 @@ public class JpaSelectQuery<T> implements SelectQuery<T> {
     public SelectQuery<T> whereNotNull(String col) {
         Path<T> column = getColumn(col);
         updateWhere(mBuilder.isNotNull(column));
+        return this;
+    }
+
+    @Override
+    public SelectQuery<T> orderBy(String col, boolean descending) {
+        Path<T> column = getColumn(col);
+        Order order = descending ?
+                mBuilder.desc(column) :
+                mBuilder.asc(column);
+
+        mQuery.orderBy(order);
         return this;
     }
 

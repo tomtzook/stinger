@@ -23,7 +23,7 @@ public abstract class AbstractFileLogger implements Logger, Closeable {
     @Override
     public void info(String message, Object... args) {
         message = String.format(message, args);
-        message = String.format("[%d] [DEBUG]: %s", System.currentTimeMillis(), message);
+        message = String.format("[%d] [INFO]: %s", System.currentTimeMillis(), message);
         log(message);
     }
 

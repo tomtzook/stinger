@@ -9,16 +9,19 @@ public class GenericProductMetadata implements ProductMetadata {
 
     private final String mId;
     private final ProductType mType;
+    private final int mPriority;
     private final Map<String, Object> mProperties;
 
-    public GenericProductMetadata(String id, ProductType type, Map<String, Object> properties) {
+    public GenericProductMetadata(String id, ProductType type, int priority,
+                                  Map<String, Object> properties) {
         mId = id;
         mType = type;
+        mPriority = priority;
         mProperties = properties;
     }
 
-    public GenericProductMetadata(String id, ProductType type) {
-        this(id, type, new HashMap<>());
+    public GenericProductMetadata(String id, int priority, ProductType type) {
+        this(id, type, priority, new HashMap<>());
     }
 
     @Override
@@ -29,6 +32,11 @@ public class GenericProductMetadata implements ProductMetadata {
     @Override
     public ProductType getType() {
         return mType;
+    }
+
+    @Override
+    public int getPriority() {
+        return mPriority;
     }
 
     @Override

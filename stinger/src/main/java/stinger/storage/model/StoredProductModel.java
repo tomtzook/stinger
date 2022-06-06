@@ -1,5 +1,6 @@
 package stinger.storage.model;
 
+import com.stinger.framework.commands.GenericCommandType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,15 +16,16 @@ public class StoredProductModel {
     @Id
     @Column(name = "product_id", nullable = false)
     private String mProductId;
-    @Enumerated(value = EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private StandardProductType mType;
+    private int mType;
     @Column(name = "path", nullable = false)
     private String mPath;
     @Column(name = "metadata", nullable = true)
     private byte[] mMetadata;
     @Column(name = "is_commit", nullable = false)
     private Boolean mIsCommited;
+    @Column(name = "priority", nullable = false)
+    private Integer mPriority;
 
     public void setProductId(String productId) {
         mProductId = productId;
@@ -33,11 +35,11 @@ public class StoredProductModel {
         return mProductId;
     }
 
-    public void setType(StandardProductType type) {
+    public void setType(int type) {
         mType = type;
     }
 
-    public StandardProductType getType() {
+    public int getType() {
         return mType;
     }
 
@@ -63,5 +65,13 @@ public class StoredProductModel {
 
     public void setCommited(Boolean isCommited) {
         mIsCommited = isCommited;
+    }
+
+    public Integer getPriority() {
+        return mPriority;
+    }
+
+    public void setPriority(Integer priority) {
+        mPriority = priority;
     }
 }

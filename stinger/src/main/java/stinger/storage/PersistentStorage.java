@@ -26,10 +26,11 @@ public class PersistentStorage implements Storage {
     }
 
     @Override
-    public ProductTransaction newTransaction(ProductType type) throws StorageException {
+    public ProductTransaction newTransaction(ProductType type, int priority)
+            throws StorageException {
         String id = generateId();
         WritableProductMetadata metadata =
-                new GenericWritableProductMetadata(id, type);
+                new GenericWritableProductMetadata(id, type, priority);
         Path dataPath = mRoot.resolve(id);
 
         try {
@@ -43,13 +44,14 @@ public class PersistentStorage implements Storage {
     }
 
     @Override
-    public String store(ProductType type, Product product) throws StorageException {
-        return store(null, type, product);
+    public String store(ProductType type, int priority, Product product) throws StorageException {
+        return store(null, type, priority, product);
     }
 
     @Override
-    public String store(CommandConfig creatingCommand, ProductType type, Product product) throws StorageException {
-        try (ProductTransaction transaction = newTransaction(type);
+    public String store(CommandConfig creatingCommand, ProductType type, int priority, Product product)
+            throws StorageException {
+        try (ProductTransaction transaction = newTransaction(type, priority);
              InputStream productStream = product.open();
              ReadableByteChannel inChannel = Channels.newChannel(productStream)) {
             if (creatingCommand != null) {

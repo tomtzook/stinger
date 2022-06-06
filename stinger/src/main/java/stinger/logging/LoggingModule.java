@@ -9,6 +9,7 @@ import com.stinger.framework.storage.StorageException;
 import stinger.storage.StandardProductType;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 public class LoggingModule extends PeriodicTaskModule {
@@ -18,6 +19,10 @@ public class LoggingModule extends PeriodicTaskModule {
     public LoggingModule(ExecutorService executorService, LoggerControl loggerControl) {
         super("LoggingModule", executorService, Constants.LOGGING_CHECK_INTERVAL_MS);
         mLoggerControl = loggerControl;
+    }
+
+    public LoggerControl getLoggerControl() {
+        return mLoggerControl;
     }
 
     @Override
@@ -31,25 +36,28 @@ public class LoggingModule extends PeriodicTaskModule {
         private final StingerEnvironment mStingerEnvironment;
         private final Logger mLogger;
 
-        private volatile long mLastRotateMs;
-
         private Task(LoggerControl loggerControl, StingerEnvironment stingerEnvironment, Logger logger) {
             mLoggerControl = loggerControl;
             mStingerEnvironment = stingerEnvironment;
             mLogger = logger;
-
-            mLastRotateMs = System.currentTimeMillis();
         }
 
         @Override
         public void run() {
-            if (mLoggerControl.getRecordCount() == Constants.LOGGING_RECORDS_ROTATE ||
-                    System.currentTimeMillis() - mLastRotateMs >= Constants.LOGGING_TIME_ROTATE_MS) {
+            if (mLoggerControl.getRecordCount() >= Constants.LOGGING_RECORDS_ROTATE) {
                 try {
+                    Optional<Product> optional = mLoggerControl.rotateIf((control)->
+                            control.getRecordCount() >= Constants.LOGGING_RECORDS_ROTATE);
+                    if (optional.isEmpty()) {
+                        return;
+                    }
+
                     mLogger.info("Doing rotation");
-                    Product product = mLoggerControl.rotate();
-                    mLastRotateMs = System.currentTimeMillis();
-                    mStingerEnvironment.getStorage().store(StandardProductType.LOG, product);
+                    Product product = optional.get();
+                    mStingerEnvironment.getStorage().store(
+                            StandardProductType.LOG,
+                            Constants.PRIORITY_LOG,
+                            product);
                 } catch (IOException e) {
                     mLogger.error("LoggerModule Rotation", e);
                 }

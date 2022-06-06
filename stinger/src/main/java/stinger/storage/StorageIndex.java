@@ -93,7 +93,9 @@ public class StorageIndex {
             mProductSerializer = productSerializer;
             mTransaction = connection.openTransaction();
 
-            mModels = mTransaction.select(StoredProductModel.class).getAll();
+            mModels = mTransaction.select(StoredProductModel.class)
+                    .orderBy("priority", true)
+                    .getAll();
         }
 
         @Override

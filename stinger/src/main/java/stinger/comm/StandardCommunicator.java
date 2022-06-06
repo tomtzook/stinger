@@ -1,20 +1,23 @@
 package stinger.comm;
 
-import stinger.StingerEnvironment;
-import stinger.commands.Executable;
-import stinger.commands.StCommandDefinition;
 import com.stinger.framework.logging.Logger;
 import com.stinger.framework.net.CommunicationException;
 import com.stinger.framework.net.Connector;
 import com.stinger.framework.net.StreamConnection;
 import com.stinger.framework.net.TcpClientConnector;
+import com.stinger.framework.storage.Product;
 import com.stinger.framework.storage.StorageException;
 import com.stinger.framework.storage.StoredProduct;
+import stinger.Constants;
+import stinger.StingerEnvironment;
+import stinger.commands.StCommandDefinition;
+import stinger.logging.LoggerControl;
+import stinger.logging.LoggingModule;
 import stinger.storage.ProductIterator;
+import stinger.storage.StandardProductType;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Iterator;
 import java.util.List;
 
 public class StandardCommunicator implements Communicator {
@@ -37,6 +40,8 @@ public class StandardCommunicator implements Communicator {
             logger.info("Reading commands");
             List<StCommandDefinition> commands = channel.readCommands();
             logger.info("New commands %s", commands.toString());
+
+            rotateLog(environment);
 
             logger.info("Sending products");
             try (ProductIterator productIterator = environment.getStorage().storedProducts()) {
@@ -64,6 +69,20 @@ public class StandardCommunicator implements Communicator {
         } catch (IOException e) {
             connection.close();
             throw e;
+        }
+    }
+
+    private void rotateLog(StingerEnvironment environment) {
+        try {
+            LoggerControl control = environment.getModules().get(LoggingModule.class)
+                    .getLoggerControl();
+            Product product = control.rotate();
+            environment.getStorage().store(
+                    StandardProductType.LOG,
+                    Constants.PRIORITY_LOG,
+                    product);
+        } catch (IOException e) {
+            environment.getLogger().error("Log rotation failed", e);
         }
     }
 }

@@ -1,15 +1,15 @@
 package com.stinger.server;
 
+import com.stinger.framework.commands.GenericCommandType;
+import com.stinger.framework.data.GenericTypesParser;
+import com.stinger.framework.data.KnownTypes;
+import com.stinger.framework.storage.GenericProductType;
 import com.stinger.framework.storage.ProductJsonSerializer;
 import com.stinger.server.comm.CommunicationModule;
 import com.stinger.server.comm.Communicator;
 import com.stinger.server.commands.CommandQueue;
 import com.stinger.server.commands.CommandsModule;
-import com.stinger.server.commands.GenericCommandType;
-import com.stinger.server.storage.GenericProductType;
 import com.stinger.server.storage.Storage;
-import com.stinger.server.util.GenericTypesParser;
-import com.stinger.server.util.KnownTypes;
 import com.stinger.framework.logging.BasicFileLogger;
 
 import java.util.concurrent.ExecutorService;
@@ -24,10 +24,10 @@ public class ServerMain {
             BasicFileLogger logger = new BasicFileLogger(files.getLogFile());
 
             KnownTypes<GenericCommandType, Integer> knownCommandTypes =
-                    new GenericTypesParser<GenericCommandType, Integer>(GenericCommandType.class)
+                    new GenericTypesParser<>(GenericCommandType.class)
                         .parseFromFile(files.getCommandTypesFile());
             KnownTypes<GenericProductType, Integer> knownProductTypes =
-                    new GenericTypesParser<GenericProductType, Integer>(GenericProductType.class)
+                    new GenericTypesParser<>(GenericProductType.class)
                             .parseFromFile(files.getProductTypesFile());
 
             CommandQueue commandQueue = new CommandQueue();
