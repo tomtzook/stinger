@@ -1,5 +1,6 @@
 package stinger.modules;
 
+import stinger.StingerControl;
 import stinger.StingerEnvironment;
 import com.stinger.framework.logging.Logger;
 
@@ -15,12 +16,14 @@ public abstract class PeriodicTaskModule extends TaskModule {
 
         private final String mModuleName;
         private final Runnable mWrapped;
+        private final StingerControl mControl;
         private final Logger mLogger;
         private final long mPeriodMs;
 
         private SafePeriodicTask(String moduleName, Runnable wrapped, StingerEnvironment environment, long periodMs) {
             mModuleName = moduleName;
             mWrapped = wrapped;
+            mControl = environment.getControl();
             mLogger = environment.getLogger();
             mPeriodMs = periodMs;
         }
@@ -28,7 +31,7 @@ public abstract class PeriodicTaskModule extends TaskModule {
         @Override
         public void run() {
             mLogger.info("Starting module %s", mModuleName);
-            while (!Thread.interrupted()) {
+            while (!Thread.interrupted() && !mControl.isInShutdown()) {
                 try {
                     mWrapped.run();
                 } catch (Throwable t) {

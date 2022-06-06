@@ -15,13 +15,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 public class Main {
 
     public static void main(String[] args) {
         loadNatives();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(Constants.CORE_THREAD_POOL_SIZE);
+        ThreadFactory factory = new StingerThreadFactory(new ThreadGroup("sst"));
+        ExecutorService executorService = Executors.newFixedThreadPool(Constants.CORE_THREAD_POOL_SIZE, factory);
         try {
             StingerFiles files = new StingerFiles();
 
