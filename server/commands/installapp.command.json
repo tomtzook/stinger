@@ -2,8 +2,6 @@
   {
     "mType": 20,
     "mParams": {
-      "id": 20,
-      "version": "1.0.0",
       "path": "/home/tomtzook/projects/frc/artemis/artemis-project/apps/example-app/build/libs/example-app.jar"
     }
   }
