@@ -13,12 +13,14 @@ import stinger.StingerEnvironment;
 import stinger.commands.StCommandDefinition;
 import stinger.logging.LoggerControl;
 import stinger.logging.LoggingModule;
+import stinger.meta.ToolMeta;
 import stinger.storage.ProductIterator;
 import stinger.storage.StandardProductType;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.Optional;
 
 public class StandardCommunicator implements Communicator {
 
@@ -37,8 +39,11 @@ public class StandardCommunicator implements Communicator {
         Logger logger = environment.getLogger();
         logger.info("Opening transaction channel");
         try (Channel channel = openChannel(environment)) {
+            logger.info("Sending meta");
+            String toolId = sendToolMeta(environment, channel);
+
             logger.info("Reading commands");
-            List<StCommandDefinition> commands = channel.readCommands();
+            List<StCommandDefinition> commands = channel.readCommands(toolId);
             logger.info("New commands %s", commands.toString());
 
             rotateLog(environment);
@@ -50,7 +55,7 @@ public class StandardCommunicator implements Communicator {
                     productIterator.remove();
 
                     logger.info("Sending product %s", product.getMetadata().getId());
-                    channel.sendProduct(product);
+                    channel.sendProduct(toolId, product);
                 }
             }
 
@@ -59,6 +64,21 @@ public class StandardCommunicator implements Communicator {
         } catch (IOException e) {
             throw new CommunicationException(e);
         }
+    }
+
+    private String sendToolMeta(StingerEnvironment environment, Channel channel) {
+        try {
+            Optional<ToolMeta> optional = environment.getToolMetaStore().getMeta();
+            if (optional.isPresent()) {
+                ToolMeta meta = optional.get();
+                channel.sendToolMeta(meta.getId(), meta);
+                return meta.getId();
+            }
+        } catch (IOException e) {
+            environment.getLogger().error("Missing tool meta", e);
+        }
+
+        return "";
     }
 
     private Channel openChannel(StingerEnvironment environment) throws IOException {

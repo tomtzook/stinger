@@ -3,14 +3,14 @@ package com.stinger.server;
 import com.stinger.framework.commands.GenericCommandType;
 import com.stinger.framework.data.GenericTypesParser;
 import com.stinger.framework.data.KnownTypes;
+import com.stinger.framework.logging.BasicFileLogger;
 import com.stinger.framework.storage.GenericProductType;
 import com.stinger.framework.storage.ProductJsonSerializer;
 import com.stinger.server.comm.CommunicationModule;
 import com.stinger.server.comm.Communicator;
 import com.stinger.server.commands.CommandQueue;
 import com.stinger.server.commands.CommandsModule;
-import com.stinger.server.storage.Storage;
-import com.stinger.framework.logging.BasicFileLogger;
+import com.stinger.server.storage.ToolStorage;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +31,7 @@ public class ServerMain {
                             .parseFromFile(files.getProductTypesFile());
 
             CommandQueue commandQueue = new CommandQueue();
-            Storage storage = new Storage(files.getStorageRoot(), logger,
+            ToolStorage storage = new ToolStorage(files.getStorageRoot(), logger,
                     new ProductJsonSerializer(knownProductTypes::getFromKey));
 
             CommunicationModule communicationModule = new CommunicationModule(

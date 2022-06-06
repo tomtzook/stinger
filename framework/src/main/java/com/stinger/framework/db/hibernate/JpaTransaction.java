@@ -38,6 +38,18 @@ public class JpaTransaction implements Transaction {
     }
 
     @Override
+    public <T> Optional<T> getFirst(Class<T> type) throws IOException {
+        ensureActive();
+
+        try {
+            return select(type).getOne();
+        } catch (RuntimeException | Error e) {
+            mTransaction.rollback();
+            throw e;
+        }
+    }
+
+    @Override
     public <T, I> Optional<T> getByIdentity(I identity, Class<T> type) throws IOException {
         ensureActive();
 

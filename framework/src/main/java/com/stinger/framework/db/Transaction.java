@@ -13,6 +13,7 @@ public interface Transaction extends Closeable {
     <T> SelectQuery<T> select(Class<T> type) throws IOException;
 
     <T> List<T> getAll(Class<T> type) throws IOException;
+    <T> Optional<T> getFirst(Class<T> type) throws IOException;
     <T, I> Optional<T> getByIdentity(I identity, Class<T> type) throws IOException;
     <T> void add(List<T> list) throws IOException;
     <T> void update(List<T> list) throws IOException;

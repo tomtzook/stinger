@@ -9,6 +9,7 @@ import stinger.comm.CommunicationModule;
 import stinger.commands.CommandModule;
 import stinger.logging.FileLogger;
 import stinger.logging.LoggingModule;
+import stinger.meta.ToolMetaStore;
 import stinger.modules.StingerModules;
 import stinger.storage.PersistentStorage;
 import stinger.storage.Storage;
@@ -30,11 +31,13 @@ public class Main {
         try {
             StingerFiles files = new StingerFiles();
 
+            ToolMetaStore toolMetaStore = ToolMetaStore.fromConfig("main");
+
             StingerControl stingerControl = new StringerControlImpl(Thread.currentThread());
             FileLogger logger = new FileLogger(files.getLogFile());
             Storage storage = new PersistentStorage(
                     files.getStorageRoot(),
-                    StorageIndex.fromConfig("storage", logger)
+                    StorageIndex.fromConfig("main", logger)
             );
 
             AppLoader appLoader = new AppLoader(logger);
@@ -47,14 +50,13 @@ public class Main {
 
             StingerEnvironmentImpl environment = new StingerEnvironmentImpl(
                     executorService,
+                    toolMetaStore,
                     storage,
                     logger,
                     stingerControl);
 
             Stinger stinger = new Stinger(environment);
             try {
-                logger.info("Stinger start");
-
                 StingerModules modules = environment.getModules();
                 modules.register(new LoggingModule(executorService, logger));
                 modules.register(new CommandModule(executorService, logger));

@@ -14,6 +14,7 @@ import stinger.apps.control.DefaultAppEnvironment;
 import stinger.util.FileHelper;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -92,7 +93,7 @@ public class StoredAppModel {
 
     public AppEnvironment getEnvironment(boolean clear) throws IOException {
         Path appRoot = Paths.get(mAppPath);
-        if (clear) {
+        if (clear && Files.exists(appRoot)) {
             FileHelper.recursiveDelete(appRoot);
         }
 

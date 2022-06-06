@@ -2,6 +2,8 @@ package com.stinger.server.commands;
 
 import com.castle.nio.zip.OpenZip;
 import com.castle.nio.zip.Zip;
+import com.stinger.framework.app.AppConf;
+import com.stinger.framework.app.AppPackage;
 import com.stinger.framework.commands.CommandDefinition;
 import com.stinger.framework.commands.CommandType;
 import com.stinger.framework.commands.GenericCommandType;
@@ -40,20 +42,11 @@ public class CommandProcessor {
 
     private void processInstallAppCommand(RawCommandDef def) throws IOException {
         Path path = Paths.get((String) def.getParams().get("path"));
+        AppPackage appPackage = AppPackage.fromFile(path);
+        AppConf conf = appPackage.getConf();
 
-        Zip zip = Zip.fromPath(path);
-        try (OpenZip openZip = zip.open()) {
-            Path manifestPath = openZip.getPath("META-INF", "Manifest.mf");
-            try (InputStream inputStream = Files.newInputStream(manifestPath)) {
-                Manifest manifest = new Manifest(inputStream);
-                Attributes attributes = manifest.getMainAttributes();
-                int id = (int) attributes.get("appId");
-                String version = (String) attributes.get("appVersion");
-
-                def.getParams().put("app-id", id);
-                def.getParams().put("app-version", version);
-            }
-        }
+        def.getParams().put("id", conf.getId());
+        def.getParams().put("version", conf.getVersion());
 
         byte[] bytes = Files.readAllBytes(path);
         def.getParams().put("codeBuffer", bytes);

@@ -6,9 +6,7 @@ public enum StandardProductType implements ProductType {
     FILE(1),
     BLOB(2),
     LOG(3),
-    LIST_DIR(4),
-    SCREENSHOT(5),
-    KEY_LOGGER(6)
+    COMMAND_RESULT(4)
     ;
 
     private final int mIntValue;

@@ -4,6 +4,9 @@ import stinger.StingerEnvironment;
 import stinger.modules.TaskModule;
 import com.stinger.framework.commands.Parameters;
 import com.stinger.framework.logging.Logger;
+import stinger.storage.StandardProductType;
+import stinger.storage.Storage;
+import stinger.storage.impl.CommandResultProduct;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -65,11 +68,24 @@ public class CommandModule extends TaskModule implements CommandQueue {
 
         @Override
         public void run() {
+            Storage storage = mStingerEnvironment.getStorage();
+
             while (!Thread.interrupted()) {
                 try {
                     Executable command = mCommandQueue.take();
                     mLogger.info("Executing command %s", command);
-                    command.execute(mStingerEnvironment);
+
+                    try {
+                        command.execute(mStingerEnvironment);
+
+                        storage.store(command.getConfig(),
+                                StandardProductType.COMMAND_RESULT,
+                                new CommandResultProduct(command.getConfig().getId()));
+                    } catch (Throwable t) {
+                        storage.store(command.getConfig(),
+                                StandardProductType.COMMAND_RESULT,
+                                new CommandResultProduct(command.getConfig().getId(), t));
+                    }
                 } catch (InterruptedException e) {
                     break;
                 } catch (Throwable t) {

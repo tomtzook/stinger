@@ -1,5 +1,6 @@
 package com.stinger.framework.data;
 
+import com.google.gson.JsonElement;
 import com.google.gson.internal.bind.JsonTreeReader;
 import com.google.gson.internal.bind.JsonTreeWriter;
 
@@ -10,6 +11,14 @@ import java.util.Map;
 
 public class TypedJsonSerializer {
 
+    public JsonElement writeTypedMap(Map<String, Object> map) throws IOException {
+        try (JsonTreeWriter writer = new JsonTreeWriter()) {
+            writeTypedMap(writer, map);
+
+            return writer.get();
+        }
+    }
+
     public void writeTypedMap(JsonTreeWriter writer, Map<String, Object> map) throws IOException {
         writer.beginObject();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -17,6 +26,12 @@ public class TypedJsonSerializer {
             writeTyped(writer, entry.getValue());
         }
         writer.endObject();
+    }
+
+    public Map<String, Object> readTypedMap(JsonElement element) throws IOException {
+        try (JsonTreeReader reader = new JsonTreeReader(element)) {
+            return readTypedMap(reader);
+        }
     }
 
     public Map<String, Object> readTypedMap(JsonTreeReader reader) throws IOException {

@@ -2,6 +2,7 @@ package com.stinger.framework.net;
 
 public enum MessageType {
     DONE(1),
+    META(2),
     REQUEST_COMMANDS(5),
     NEW_PRODUCT(10);
 

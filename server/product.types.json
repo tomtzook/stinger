@@ -12,15 +12,7 @@
     "mIntValue": 3
   },
   {
-    "mName": "LIST_DIR",
+    "mName": "COMMAND_RESULT",
     "mIntValue": 4
-  },
-  {
-    "mName": "SCREENSHOT",
-    "mIntValue": 5
-  },
-  {
-    "mName": "KEY_LOGGER",
-    "mIntValue": 6
   }
 ]

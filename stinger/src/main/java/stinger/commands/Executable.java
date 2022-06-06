@@ -19,4 +19,8 @@ public class Executable {
     public void execute(StingerEnvironment environment) throws CommandException {
         mCommand.execute(environment, mConfig, mParameters);
     }
+
+    public CommandConfig getConfig() {
+        return mConfig;
+    }
 }
