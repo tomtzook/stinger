@@ -1,3 +1,6 @@
 include 'framework'
+include 'app-api'
 include 'stinger'
 include 'server'
+
+include ':apps:example-app'

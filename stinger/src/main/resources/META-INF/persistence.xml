@@ -17,4 +17,18 @@
             <property name="javax.persistence.jdbc.password" value="root"/>
         </properties>
     </persistence-unit>
+    <persistence-unit name="appstore">
+        <description>Units and Targets</description>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>stinger.apps.control.store.StoredAppModel</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <property name="hibernate.dialect" value="org.sqlite.hibernate.dialect.SQLiteDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:sqlite:sto.db"/>
+            <property name="javax.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.password" value="root"/>
+        </properties>
+    </persistence-unit>
 </persistence>

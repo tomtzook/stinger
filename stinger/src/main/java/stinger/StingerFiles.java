@@ -29,6 +29,10 @@ public class StingerFiles {
         return existingDirectory("str");
     }
 
+    public Path getAppsRoot() throws IOException {
+        return existingDirectory("approot");
+    }
+
     private Path existingDirectory(String name) throws IOException {
         Path directory = mStingerDir.resolve(name);
         Files.createDirectories(directory);

@@ -4,6 +4,7 @@ import com.google.gson.internal.bind.JsonTreeReader;
 import com.google.gson.internal.bind.JsonTreeWriter;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,6 +59,11 @@ public class TypedJsonSerializer {
             writer.name("type").value(SerializedType.BOOLEAN.intValue());
             writer.name("value").value((Boolean) value);
             writer.endObject();
+        } else if (value instanceof byte[]) {
+            writer.beginObject();
+            writer.name("type").value(SerializedType.BLOB.intValue());
+            writer.name("value").value(Base64.getEncoder().encodeToString((byte[]) value));
+            writer.endObject();
         } else {
             throw new IOException("unsupported type: " + value.getClass().getName());
         }
@@ -92,6 +98,10 @@ public class TypedJsonSerializer {
             case BOOLEAN: {
                 value = reader.nextBoolean();
                 break;
+            }
+            case BLOB: {
+                String str = reader.nextString();
+                return Base64.getDecoder().decode(str);
             }
             default: throw new IOException("unsupported type: " + type.name());
         }

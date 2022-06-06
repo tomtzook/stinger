@@ -5,7 +5,9 @@ public enum SerializedType {
     INTEGER(1),
     DOUBLE(2),
     STRING(3),
-    BOOLEAN(4);
+    BOOLEAN(4),
+    BLOB(5)
+    ;
 
     private final int mIntValue;
 

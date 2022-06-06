@@ -21,6 +21,7 @@ configurations {
 
 dependencies {
     implementation project(':framework')
+    implementation project(':app-api')
 
     implementation 'com.github.tomtzook:castle:1.0.0'
     implementation "com.google.code.gson:gson:2.8.5"

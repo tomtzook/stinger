@@ -32,6 +32,10 @@ public class TypedSerializer {
         } else if (value instanceof Boolean) {
             output.writeInt(SerializedType.BOOLEAN.intValue());
             output.writeBoolean((Boolean) value);
+        } else if (value instanceof byte[]) {
+            output.writeInt(SerializedType.BLOB.intValue());
+            output.writeInt(((byte[])value).length);
+            output.write((byte[]) value);
         } else {
             throw new IOException("unsupported type: " + value.getClass().getName());
         }
@@ -60,6 +64,12 @@ public class TypedSerializer {
             case DOUBLE: return input.readDouble();
             case STRING: return input.readUTF();
             case BOOLEAN: return input.readBoolean();
+            case BLOB: {
+                int length = input.readInt();
+                byte[] data = new byte[length];
+                input.readFully(data);
+                return data;
+            }
             default: throw new IOException("unsupported type: " + type.name());
         }
     }

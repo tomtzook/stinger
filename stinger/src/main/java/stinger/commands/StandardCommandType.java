@@ -1,8 +1,10 @@
 package stinger.commands;
 
 import stinger.commands.impl.GetFileCommand;
+import stinger.commands.impl.InstallAppCommand;
 import stinger.commands.impl.StopCommand;
 import com.stinger.framework.commands.CommandType;
+import stinger.commands.impl.UninstallAppCommand;
 
 public enum StandardCommandType implements CommandType {
     GET_FILE(2) {
@@ -15,6 +17,18 @@ public enum StandardCommandType implements CommandType {
         @Override
         public Command createCommand() {
             return new StopCommand();
+        }
+    },
+    INSTALL_APP(20) {
+        @Override
+        public Command createCommand() {
+            return new InstallAppCommand();
+        }
+    },
+    UNINSTALL_APP(21) {
+        @Override
+        public Command createCommand() {
+            return new UninstallAppCommand();
         }
     }
     ;

@@ -2,10 +2,6 @@ package com.stinger.server.commands;
 
 import com.google.gson.Gson;
 import com.stinger.framework.commands.CommandDefinition;
-import com.stinger.framework.commands.CommandType;
-import com.stinger.framework.commands.GenericCommandType;
-import com.stinger.framework.commands.Parameters;
-import com.stinger.framework.data.KnownTypes;
 import com.stinger.framework.logging.Logger;
 
 import java.io.IOException;
@@ -15,21 +11,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CommandsCollector {
 
     private final Path mCommandsDir;
     private final CommandQueue mCommandQueue;
-    private final KnownTypes<GenericCommandType, Integer> mCommandTypes;
+    private final CommandProcessor mCommandProcessor;
     private final Logger mLogger;
     private final Gson mGson;
 
     public CommandsCollector(Path commandsDir, CommandQueue commandQueue,
-                             KnownTypes<GenericCommandType, Integer> commandTypes, Logger logger) {
+                             CommandProcessor commandProcessor,
+                             Logger logger) {
         mCommandsDir = commandsDir;
         mCommandQueue = commandQueue;
-        mCommandTypes = commandTypes;
+        mCommandProcessor = commandProcessor;
         mLogger = logger;
         mGson = new Gson();
     }
@@ -68,33 +64,14 @@ public class CommandsCollector {
     private List<CommandDefinition> parseCommands(RawCommandDef[] commandDefs) {
         List<CommandDefinition> commandDefinitions = new ArrayList<>(commandDefs.length);
         for (RawCommandDef def : commandDefs) {
-            CommandType commandType = mCommandTypes.getFromKey(def.getType());
-            CommandDefinition commandDefinition = new CommandDefinition(
-                    commandType,
-                    new Parameters(def.getParams())
-            );
-            commandDefinitions.add(commandDefinition);
+            try {
+                CommandDefinition commandDefinition = mCommandProcessor.processCommand(def);
+                commandDefinitions.add(commandDefinition);
+            } catch (Throwable t) {
+                mLogger.error("Error processing command definition", t);
+            }
         }
 
         return commandDefinitions;
-    }
-
-    private static class RawCommandDef {
-
-        private final int mType;
-        private final Map<String, Object> mParams;
-
-        private RawCommandDef(int type, Map<String, Object> params) {
-            mType = type;
-            mParams = params;
-        }
-
-        public int getType() {
-            return mType;
-        }
-
-        public Map<String, Object> getParams() {
-            return mParams;
-        }
     }
 }

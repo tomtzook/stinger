@@ -6,5 +6,13 @@
   {
     "mName": "STOP",
     "mIntValue": 3
+  },
+  {
+    "mName": "INSTALL_APP",
+    "mIntValue": 20
+  },
+  {
+    "mName": "UNINSTALL_APP",
+    "mIntValue": 21
   }
 ]

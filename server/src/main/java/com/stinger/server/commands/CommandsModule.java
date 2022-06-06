@@ -1,8 +1,8 @@
 package com.stinger.server.commands;
 
+import com.stinger.framework.logging.Logger;
 import com.stinger.server.Constants;
 import com.stinger.server.Environment;
-import com.stinger.framework.logging.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,8 +38,10 @@ public class CommandsModule {
         private final CommandsCollector mCommandsCollector;
 
         private Task(Path commandsDir, Environment environment) {
-            mCommandsCollector = new CommandsCollector(commandsDir, environment.getCommandQueue(),
-                    environment.getCommandTypes(), environment.getLogger());
+            mCommandsCollector = new CommandsCollector(commandsDir,
+                    environment.getCommandQueue(),
+                    new CommandProcessor(environment.getCommandTypes()),
+                    environment.getLogger());
             mLogger = environment.getLogger();
         }
 

@@ -1,11 +1,14 @@
 package stinger;
 
+import stinger.apps.control.AppControlModule;
+import stinger.apps.control.AppLoader;
+import stinger.apps.control.ops.AppsWatchdogModule;
+import stinger.apps.control.ops.OperationsQueue;
+import stinger.apps.control.store.AppStorage;
 import stinger.comm.CommunicationModule;
 import stinger.commands.CommandModule;
 import stinger.logging.FileLogger;
 import stinger.logging.LoggingModule;
-import stinger.modules.Module;
-import stinger.modules.StingerModuleImpl;
 import stinger.modules.StingerModules;
 import stinger.storage.PersistentStorage;
 import stinger.storage.Storage;
@@ -34,6 +37,14 @@ public class Main {
                     StorageIndex.fromConfig("storage", logger)
             );
 
+            AppLoader appLoader = new AppLoader(logger);
+            AppStorage appStorage = AppStorage.fromConfig("appstore", files.getAppsRoot(), appLoader);
+            OperationsQueue operationsQueue = new OperationsQueue();
+            AppControlModule appControlModule =
+                    new AppControlModule(executorService, appStorage, operationsQueue, logger);
+            AppsWatchdogModule appsWatchdogModule =
+                    new AppsWatchdogModule(executorService, appStorage, operationsQueue);
+
             StingerEnvironmentImpl environment = new StingerEnvironmentImpl(
                     executorService,
                     storage,
@@ -48,11 +59,15 @@ public class Main {
                 modules.register(new LoggingModule(executorService, logger));
                 modules.register(new CommandModule(executorService, logger));
                 modules.register(new CommunicationModule(executorService));
+                modules.register(appControlModule);
+                modules.register(appsWatchdogModule);
 
                 stinger.start(new HashSet<>(Arrays.asList(
                         LoggingModule.class,
                         CommandModule.class,
-                        CommunicationModule.class
+                        CommunicationModule.class,
+                        AppControlModule.class,
+                        AppsWatchdogModule.class
                 )));
             } finally {
                 stinger.stop();
