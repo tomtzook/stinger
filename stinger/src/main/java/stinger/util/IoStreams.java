@@ -28,7 +28,9 @@ public class IoStreams {
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
         while (in.read(buffer) > 0) {
+            buffer.flip();
             out.write(buffer);
+            buffer.clear();
         }
     }
 
