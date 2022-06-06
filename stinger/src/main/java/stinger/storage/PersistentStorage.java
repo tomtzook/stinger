@@ -1,12 +1,9 @@
 package stinger.storage;
 
 import com.stinger.framework.storage.GenericWritableProductMetadata;
-import com.stinger.framework.storage.InFileStoredProduct;
 import com.stinger.framework.storage.Product;
-import com.stinger.framework.storage.ProductMetadata;
 import com.stinger.framework.storage.ProductType;
 import com.stinger.framework.storage.StorageException;
-import com.stinger.framework.storage.StoredProduct;
 import com.stinger.framework.storage.WritableProductMetadata;
 import stinger.commands.CommandConfig;
 import stinger.util.IoStreams;
@@ -16,7 +13,6 @@ import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.UUID;
 
 public class PersistentStorage implements Storage {
@@ -34,16 +30,14 @@ public class PersistentStorage implements Storage {
         String id = generateId();
         WritableProductMetadata metadata =
                 new GenericWritableProductMetadata(id, type);
-        Path file = mRoot.resolve(id);
+        Path dataPath = mRoot.resolve(id);
 
-        mStorageIndex.addProduct(file, metadata);
         try {
             return new PersistentProductTransaction(
-                    this,
+                    mStorageIndex.addProduct(metadata, dataPath),
                     metadata,
-                    file);
+                    dataPath);
         } catch (IOException e) {
-            mStorageIndex.rollbackProduct(file, metadata);
             throw new StorageException(e);
         }
     }
@@ -72,16 +66,8 @@ public class PersistentStorage implements Storage {
     }
 
     @Override
-    public Iterator<StoredProduct> storedProducts() throws StorageException {
+    public ProductIterator storedProducts() throws StorageException {
         return mStorageIndex.storedProductsSnapshot();
-    }
-
-    public void commit(PersistentProductTransaction transaction) throws StorageException {
-        mStorageIndex.commitProduct(transaction.getMetadata());
-    }
-
-    public void rollback(PersistentProductTransaction transaction) throws StorageException {
-        mStorageIndex.rollbackProduct(transaction.getPath(), transaction.getMetadata());
     }
 
     private String generateId() {

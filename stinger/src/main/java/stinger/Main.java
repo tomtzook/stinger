@@ -29,7 +29,7 @@ public class Main {
             FileLogger logger = new FileLogger(files.getLogFile());
             Storage storage = new PersistentStorage(
                     files.getStorageRoot(),
-                    StorageIndex.inFile(files.getStorageIndexDbPath(), logger)
+                    StorageIndex.fromConfig("storage", logger)
             );
 
             StingerEnvironmentImpl environment = new StingerEnvironmentImpl(

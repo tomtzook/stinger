@@ -2,8 +2,12 @@ package com.stinger.framework.storage;
 
 import com.stinger.framework.util.IoStreams;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -19,8 +23,18 @@ public class ProductSerializer {
         mProductClassifier = productClassifier;
     }
 
+    public byte[] serialize(StoredProduct product) throws IOException {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             DataOutputStream dataOutputStream = new DataOutputStream(outputStream)) {
+            serialize(dataOutputStream, product);
+
+            dataOutputStream.flush();
+            return outputStream.toByteArray();
+        }
+    }
+
     public void serialize(DataOutput output, StoredProduct product) throws IOException {
-        serialize(output, product.getMetadata());
+        serializeMetadata(output, product.getMetadata());
 
         try (InputStream inputStream = product.open()) {
             byte[] data = IoStreams.readAll(inputStream);
@@ -29,7 +43,17 @@ public class ProductSerializer {
         }
     }
 
-    public void serialize(DataOutput output, ProductMetadata metadata) throws IOException {
+    public byte[] serialize(ProductMetadata metadata) throws IOException {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             DataOutputStream dataOutputStream = new DataOutputStream(outputStream)) {
+            serializeMetadata(dataOutputStream, metadata);
+
+            dataOutputStream.flush();
+            return outputStream.toByteArray();
+        }
+    }
+
+    public void serializeMetadata(DataOutput output, ProductMetadata metadata) throws IOException {
         output.writeUTF(metadata.getId());
         output.writeInt(metadata.getType().intValue());
 
@@ -43,6 +67,13 @@ public class ProductSerializer {
         }
     }
 
+    public StoredProduct deserialize(byte[] data) throws IOException {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+             DataInputStream dataInputStream = new DataInputStream(inputStream)) {
+            return deserialize(dataInputStream);
+        }
+    }
+
     public StoredProduct deserialize(DataInput input) throws IOException {
         ProductMetadata metadata = deserializeMetadata(input);
 
@@ -51,6 +82,13 @@ public class ProductSerializer {
         input.readFully(data);
 
         return new InMemoryStoredProduct(metadata, data);
+    }
+
+    public ProductMetadata deserializeMetadata(byte[] data) throws IOException {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+             DataInputStream dataInputStream = new DataInputStream(inputStream)) {
+            return deserializeMetadata(dataInputStream);
+        }
     }
 
     public ProductMetadata deserializeMetadata(DataInput input) throws IOException {

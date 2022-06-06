@@ -1,5 +1,6 @@
 package stinger.storage;
 
+import com.castle.util.closeables.Closer;
 import com.stinger.framework.storage.StorageException;
 import com.stinger.framework.storage.WritableProductMetadata;
 
@@ -12,17 +13,15 @@ import java.nio.file.StandardOpenOption;
 
 public class PersistentProductTransaction implements ProductTransaction {
 
-    private final PersistentStorage mStorage;
+    private final ProductIndexTransaction mTransaction;
     private final WritableProductMetadata mMetadata;
-    private final Path mPath;
     private final SeekableByteChannel mChannel;
 
-    public PersistentProductTransaction(PersistentStorage storage,
+    public PersistentProductTransaction(ProductIndexTransaction transaction,
                                         WritableProductMetadata metadata,
                                         Path path) throws IOException {
-        mStorage = storage;
+        mTransaction = transaction;
         mMetadata = metadata;
-        mPath = path;
         mChannel = Files.newByteChannel(path,
                 StandardOpenOption.TRUNCATE_EXISTING,
                 StandardOpenOption.CREATE_NEW,
@@ -42,7 +41,7 @@ public class PersistentProductTransaction implements ProductTransaction {
             throw new StorageException(e);
         }
 
-        mStorage.commit(this);
+        mTransaction.commit();
     }
 
     @Override
@@ -57,18 +56,18 @@ public class PersistentProductTransaction implements ProductTransaction {
 
     @Override
     public void close() throws IOException {
+        Closer closer = Closer.empty();
         if (mChannel.isOpen()) {
-            mChannel.close();
-
-            try {
-                mStorage.rollback(this);
-            } catch (StorageException e) {
-                throw new IOException(e);
-            }
+            closer.add(mChannel);
+            mTransaction.rollback();
         }
-    }
 
-    public Path getPath() {
-        return mPath;
+        closer.add(mTransaction);
+
+        try {
+            closer.close();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 }

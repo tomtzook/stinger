@@ -1,9 +1,8 @@
 package stinger.logging;
 
-import stinger.storage.StandardProductType;
-import stinger.storage.impl.FileProduct;
 import com.stinger.framework.logging.AbstractFileLogger;
 import com.stinger.framework.storage.Product;
+import stinger.storage.impl.FileProduct;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -47,7 +46,7 @@ public class FileLogger extends AbstractFileLogger implements LoggerControl {
             mLogLock.unlock();
         }
 
-        return new FileProduct(oldFile, StandardProductType.LOG);
+        return new FileProduct(oldFile);
     }
 
     @Override

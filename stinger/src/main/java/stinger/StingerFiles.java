@@ -25,10 +25,6 @@ public class StingerFiles {
         return mStingerDir.resolve("lgbt");
     }
 
-    public Path getStorageIndexDbPath() {
-        return mStingerDir.resolve("sto.db");
-    }
-
     public Path getStorageRoot() throws IOException {
         return existingDirectory("str");
     }

@@ -15,5 +15,5 @@ public interface Storage {
     String store(ProductType type, Product product) throws StorageException;
     String store(CommandConfig creatingCommand, ProductType type, Product product) throws StorageException;
 
-    Iterator<StoredProduct> storedProducts() throws StorageException;
+    ProductIterator storedProducts() throws StorageException;
 }

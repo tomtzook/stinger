@@ -1,10 +1,8 @@
 package com.stinger.server.comm;
 
-import com.castle.net.Connector;
-import com.castle.net.StreamConnection;
-import com.castle.net.tcp.TcpServerConnector;
-import com.castle.time.Time;
-import com.castle.time.exceptions.TimeoutException;
+import com.stinger.framework.net.Connector;
+import com.stinger.framework.net.StreamConnection;
+import com.stinger.framework.net.TcpServerConnector;
 import com.stinger.server.Environment;
 
 import java.io.Closeable;
@@ -20,12 +18,12 @@ public class Communicator implements Closeable {
     }
 
     public Communicator(SocketAddress bindAddress) throws IOException {
-        this(new TcpServerConnector(bindAddress, 100));
+        this(new TcpServerConnector(bindAddress));
     }
 
-    public void handleNextClient(Environment environment) throws IOException, TimeoutException {
+    public void handleNextClient(Environment environment) throws IOException {
         environment.getLogger().info("Waiting connect %s", mConnector);
-        StreamConnection connection = mConnector.connect(Time.milliseconds(1000));
+        StreamConnection connection = mConnector.connect(1000);
         doTransaction(environment, connection);
     }
 

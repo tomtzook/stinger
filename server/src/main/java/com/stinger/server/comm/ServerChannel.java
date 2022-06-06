@@ -1,6 +1,6 @@
 package com.stinger.server.comm;
 
-import com.castle.net.StreamConnection;
+import com.stinger.framework.net.StreamConnection;
 import com.stinger.server.commands.GenericCommandType;
 import com.stinger.server.storage.GenericProductType;
 import com.stinger.server.util.KnownTypes;

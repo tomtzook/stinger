@@ -10,6 +10,7 @@ import com.stinger.framework.net.StreamConnection;
 import com.stinger.framework.net.TcpClientConnector;
 import com.stinger.framework.storage.StorageException;
 import com.stinger.framework.storage.StoredProduct;
+import stinger.storage.ProductIterator;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -38,12 +39,14 @@ public class StandardCommunicator implements Communicator {
             logger.info("New commands %s", commands.toString());
 
             logger.info("Sending products");
-            Iterator<StoredProduct> productIterator = environment.getStorage().storedProducts();
-            while (productIterator.hasNext()) {
-                StoredProduct product = productIterator.next();
-                logger.info("Sending product %s", product.getMetadata().getId());
-                channel.sendProduct(product);
-                productIterator.remove();
+            try (ProductIterator productIterator = environment.getStorage().storedProducts()) {
+                while (productIterator.hasNext()) {
+                    StoredProduct product = productIterator.next();
+                    productIterator.remove();
+
+                    logger.info("Sending product %s", product.getMetadata().getId());
+                    channel.sendProduct(product);
+                }
             }
 
             logger.info("Transaction finished");

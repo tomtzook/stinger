@@ -1,195 +1,144 @@
 package stinger.storage;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.internal.bind.JsonTreeReader;
-import com.google.gson.internal.bind.JsonTreeWriter;
+import com.castle.util.closeables.Closer;
+import com.stinger.framework.db.Connection;
 import com.stinger.framework.db.Database;
-import com.stinger.framework.db.DatabaseException;
-import com.stinger.framework.db.JdbcDatabase;
+import com.stinger.framework.db.Transaction;
+import com.stinger.framework.db.hibernate.JpaDatabase;
 import com.stinger.framework.logging.Logger;
-import com.stinger.framework.storage.GenericProductMetadata;
 import com.stinger.framework.storage.InFileStoredProduct;
-import com.stinger.framework.storage.ProductJsonSerializer;
 import com.stinger.framework.storage.ProductMetadata;
+import com.stinger.framework.storage.ProductSerializer;
 import com.stinger.framework.storage.StorageException;
 import com.stinger.framework.storage.StoredProduct;
+import stinger.storage.model.StoredProductModel;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class StorageIndex {
 
     private final Database mDatabase;
     private final Logger mLogger;
-    private final ProductJsonSerializer mProductJsonSerializer;
+    private final ProductSerializer mProductSerializer;
 
     public StorageIndex(Database database, Logger logger) throws StorageException {
         mDatabase = database;
         mLogger = logger;
-        mProductJsonSerializer = new ProductJsonSerializer(StandardProductType::fromInt);
+        mProductSerializer = new ProductSerializer(StandardProductType::fromInt);
+    }
 
+    public static StorageIndex fromConfig(String configName, Logger logger) throws StorageException {
         try {
-            createTable();
-        } catch (DatabaseException e) {
+            Database database = new JpaDatabase(configName);
+            return new StorageIndex(database, logger);
+        } catch (IOException e) {
             throw new StorageException(e);
         }
     }
 
-    public static StorageIndex inFile(Path dbFile, Logger logger) throws StorageException {
+    public ProductIndexTransaction addProduct(ProductMetadata metadata, Path dataPath) throws StorageException {
         try {
-            if (!Files.exists(dbFile)) {
-                Files.createFile(dbFile);
+            Connection connection = mDatabase.open();
+            try {
+                return new ProductIndexTransaction(
+                        connection,
+                        metadata,
+                        dataPath,
+                        mProductSerializer);
+            } catch (IOException e) {
+                connection.close();
+                throw e;
+            }
+        } catch (IOException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    public ProductIterator storedProductsSnapshot() throws StorageException {
+        try {
+            Connection connection = mDatabase.open();
+            try {
+                return new ProductsIteratorImpl(connection, mProductSerializer);
+            } catch (IOException e) {
+                try {
+                    connection.close();
+                } catch (IOException e1) {
+                    e.addSuppressed(e1);
+                }
+
+                throw e;
+            }
+        } catch (IOException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    private static class ProductsIteratorImpl implements ProductIterator {
+
+        private final Connection mConnection;
+        private final ProductSerializer mProductSerializer;
+        private final Transaction mTransaction;
+
+        private final List<StoredProductModel> mModels;
+        private int mCurrentIndex = -1;
+
+        private ProductsIteratorImpl(Connection connection,
+                                     ProductSerializer productSerializer)
+                throws IOException {
+            mConnection = connection;
+            mProductSerializer = productSerializer;
+            mTransaction = connection.openTransaction();
+
+            mModels = mTransaction.select(StoredProductModel.class).getAll();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return mCurrentIndex < mModels.size() - 1;
+        }
+
+        @Override
+        public StoredProduct next() throws IOException {
+            mCurrentIndex++;
+            if (mCurrentIndex < 0 || mCurrentIndex >= mModels.size()) {
+                throw new NoSuchElementException();
             }
 
-            Database database = JdbcDatabase.open(dbFile);
-            return new StorageIndex(database, logger);
-        } catch (ClassNotFoundException | SQLException | IOException e) {
-            throw new StorageException(e);
-        }
-    }
+            StoredProductModel model = mModels.get(mCurrentIndex);
 
-    public void addProduct(Path dataPath, ProductMetadata metadata) throws StorageException {
-        try {
-            mDatabase.update("INSERT INTO pros (prid, type, path, is_commited) VALUES (?,?,?,?)",
-                    metadata.getId(),
-                    metadata.getType().intValue(),
-                    dataPath.toAbsolutePath().toString(),
-                    false);
-        } catch (DatabaseException e) {
-            throw new StorageException(e);
-        }
-    }
-
-    public void commitProduct(ProductMetadata metadata) throws StorageException {
-        try {
-            String metadataJson = metadataToJson(metadata);
-            mDatabase.update("UPDATE pros SET metadata=%s, is_commited=%s WHERE prid=%s",
-                    metadataJson,
-                    true,
-                    metadata.getId());
-        } catch (DatabaseException e) {
-            throw new StorageException(e);
-        }
-    }
-
-    public void rollbackProduct(Path dataPath, ProductMetadata metadata) {
-        try {
-            mDatabase.update("DELETE FROM pros WHERE prid=?", metadata.getId());
-        } catch (DatabaseException e) {
-            mLogger.error("Storage remove index error", e);
+            ProductMetadata metadata = mProductSerializer.deserializeMetadata(model.getMetadata());
+            return new InFileStoredProduct(
+                    metadata,
+                    Paths.get(model.getPath()));
         }
 
-        try {
-            Files.deleteIfExists(dataPath);
-        } catch (IOException e) {
-            mLogger.error("Storage remove path error", e);
-        }
-    }
+        @Override
+        public void remove() throws IOException {
+            if (mCurrentIndex < 0 || mCurrentIndex >= mModels.size()) {
+                throw new NoSuchElementException();
+            }
 
-    public Iterator<StoredProduct> storedProductsSnapshot() throws StorageException {
-        try {
-            List<Map<String, Object>> data = mDatabase.query("SELECT * FROM pros");
-            List<InFileStoredProduct> storedProducts = parseProducts(data);
-
-            return new Iterator<>() {
-                int currentIndex = -1;
-
-                @Override
-                public boolean hasNext() {
-                    return currentIndex < storedProducts.size() - 1;
-                }
-
-                @Override
-                public StoredProduct next() {
-                    currentIndex++;
-                    if (currentIndex < 0 || currentIndex >= storedProducts.size()) {
-                        throw new NoSuchElementException();
-                    }
-
-                    return storedProducts.get(currentIndex);
-                }
-
-                @Override
-                public void remove() {
-                    if (currentIndex < 0 || currentIndex >= storedProducts.size()) {
-                        throw new NoSuchElementException();
-                    }
-
-                    StorageIndex.this.remove(storedProducts.get(currentIndex));
-                }
-            };
-        } catch (DatabaseException e) {
-            throw new StorageException(e);
-        }
-    }
-
-    private void createTable() throws DatabaseException {
-        mDatabase.update(String.format("CREATE TABLE IF NOT EXISTS pros (%s,%s,%s,%s,%s)",
-                "prid NVARCHAR UNIQUE NOT NULL",
-                "type INT NOT NULL",
-                "path NVARCHAR NOT NULL",
-                "metadata NVARCHAR NULL",
-                "is_commited BOOL NOT NULL"));
-    }
-
-    private void remove(InFileStoredProduct product) {
-        try {
-            mDatabase.update("DELETE FROM pros WHERE prid=?", product.getMetadata().getId());
-        } catch (DatabaseException e) {
-            mLogger.error("Storage remove index error", e);
+            StoredProductModel model = mModels.get(mCurrentIndex);
+            mTransaction.delete(model);
         }
 
-        try {
-            Files.deleteIfExists(product.getDataPath());
-        } catch (IOException e) {
-            mLogger.error("Storage remove path error", e);
-        }
-    }
+        @Override
+        public void close() throws IOException {
+            mTransaction.commit();
 
-    private List<InFileStoredProduct> parseProducts(List<Map<String, Object>> data) throws StorageException {
-        List<InFileStoredProduct> products = new ArrayList<>();
+            Closer closer = Closer.empty();
+            closer.add(mTransaction);
+            closer.add(mConnection);
 
-        for (Map<String, Object> map : data) {
-            //String id = (String) map.get("prid");
-            //int typeInt = (int) map.get("type");
-            String pathStr = (String) map.get("path");
-            String metadataJson = (String) map.get("metadata");
-            ProductMetadata metadata = jsonToMetadata(metadataJson);
-
-            InFileStoredProduct storedProduct = new InFileStoredProduct(metadata, Paths.get(pathStr));
-            products.add(storedProduct);
-        }
-
-        return products;
-    }
-
-    private String metadataToJson(ProductMetadata metadata) throws StorageException {
-        try {
-            JsonElement element = mProductJsonSerializer.serialize(metadata);
-            return element.toString();
-        } catch (IOException e) {
-            throw new StorageException(e);
-        }
-    }
-
-    private ProductMetadata jsonToMetadata(String json) throws StorageException {
-        try {
-            JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(json);
-
-            return mProductJsonSerializer.deserialize(element);
-        } catch (IOException e) {
-            throw new StorageException(e);
+            try {
+                closer.close();
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
         }
     }
 }

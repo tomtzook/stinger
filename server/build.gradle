@@ -16,5 +16,5 @@ dependencies {
 }
 
 application {
-    mainClassName = 'com.com.stinger.server.ServerMain'
+    mainClassName = 'com.stinger.server.ServerMain'
 }

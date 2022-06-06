@@ -56,10 +56,12 @@ public class CommunicationModule {
                         mCommunicator.handleNextClient(mEnvironment);
                     } catch (IOException e) {
                         mLogger.error("error handling client", e);
+                    }  catch (Throwable t) {
+                        mLogger.error("Unexpected error in CommunicationModule", t);
                     }
                 }
             } catch (Throwable t) {
-                mLogger.error("Unexpected error in CommunicationModule", t);
+                mLogger.error("CommunicationModule thread broken", t);
             }
         }
     }

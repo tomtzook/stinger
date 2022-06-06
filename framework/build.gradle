@@ -13,4 +13,8 @@ repositories {
 
 dependencies {
     api group: 'com.github.tomtzook', name: 'castle', version: CASTLE_VERSION
+
+    api 'org.hibernate:hibernate-core-jakarta:5.6.7.Final'
+    api 'org.glassfish.jaxb:jaxb-runtime:3.0.0'
+    api 'com.github.gwenn:sqlite-dialect:0.1.2'
 }

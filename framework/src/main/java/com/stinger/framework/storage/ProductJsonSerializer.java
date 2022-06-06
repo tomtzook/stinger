@@ -23,6 +23,7 @@ public class ProductJsonSerializer {
             writer.name("id").value(metadata.getId());
             writer.name("type").value(metadata.getType().name());
             writer.name("typeInt").value(metadata.getType().intValue());
+            writer.name("props");
             writeProps(writer, metadata);
             writer.endObject();
 
@@ -42,7 +43,7 @@ public class ProductJsonSerializer {
             int typeInt = reader.nextInt();
             ProductType type = mProductClassifier.apply(typeInt);
 
-
+            expectName(reader, "props");
             Map<String, Object> props = readProps(reader);
             reader.endObject();
 
